@@ -594,6 +594,34 @@ public class CubeSpawner : MonoBehaviour {
 
     }
 
+    //Cover all faces in rubber.
+    public void SpawnRubberAllFaces()
+    {
+        SpawnRubberOnFace(FixRotation.Face.North);
+        SpawnRubberOnFace(FixRotation.Face.East);
+        SpawnRubberOnFace(FixRotation.Face.West);
+        SpawnRubberOnFace(FixRotation.Face.South);
+        SpawnRubberOnFace(FixRotation.Face.Top);
+        SpawnRubberOnFace(FixRotation.Face.Bottom);
+    }
+
+    //Cover a face in rubber.
+    public void SpawnRubberOnFace(FixRotation.Face face)
+    {
+        FaceInfo faceBlocks = GetFaceBlocks(face);
+
+        if (faceBlocks != null)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    faceBlocks.faceBlocks[i].row[j] = 3;
+                }
+            }
+        }
+    }
+
     //Save the object as a prefab, as well as any modifications to make it game ready.
     public void SaveAsPrefab(Transform transform)
     {
@@ -609,6 +637,11 @@ public class CubeSpawner : MonoBehaviour {
         //Destroy the CubeSpawner script, since it's for editting, then destroy the placeholder cubes underlying the puzzle since they are now unnecessary.
         DestroyImmediate(spawnedPrefab.GetComponent<CubeSpawner>());
         DestroyImmediate(spawnedPrefab.transform.FindChild("Cubes").gameObject);
+        EmitterScript[] emitters = spawnedPrefab.transform.GetComponentsInChildren<EmitterScript>();
+        for(int i = 0; i < emitters.Length; i++)
+        {
+            emitters[i].linePositions.Clear();
+        }
 
         //Replace the prefab with the modified one. Destroy the one that exists in the scene.
         PrefabUtility.ReplacePrefab(spawnedPrefab, prefab);
@@ -658,6 +691,16 @@ public class CubeSpawnerEditor : Editor
         if (GUILayout.Button("Make Walls on all faces."))
         {
             script.SpawnWallsAllFaces();
+        }
+
+        if (GUILayout.Button("Make Rubber on Selected Face"))
+        {
+            script.SpawnRubberOnFace(script.selectedFace);
+        }
+
+        if (GUILayout.Button("Make Rubber on all faces."))
+        {
+            script.SpawnRubberAllFaces();
         }
  
         if (GUILayout.Button("Reset Selected Face"))

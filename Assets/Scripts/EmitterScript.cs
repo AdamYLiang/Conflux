@@ -16,13 +16,16 @@ public class EmitterScript : MonoBehaviour {
     GameObject receiver = null;
 
     //All the positions we need to add to the grid
-    public List<Vector3> linePositions = new List<Vector3>();
+    public List<GameObject> linePositions = new List<GameObject>();
     //A conversion of the list above to the coordinates on the cube
     public List<Vector3> linePositionsOnGrid = new List<Vector3>();
     //The size of one step in any direction on the grid
     public float unitSize = 2.5f, cornerDifference = 0.75f, heightDifference = 0.5f;
 
     private Vector3 laserOriginCoordinate;
+
+    public LayerMask checkLayerMask;
+    public bool drawing = false;
 
 	// Use this for initialization
 	void Start () {
@@ -38,18 +41,19 @@ public class EmitterScript : MonoBehaviour {
         //Debug.Log(laserOriginCoordinate);
 
         //Initialize the emitter.
-        linePositions.Add(new Vector3(heightDifference, 0, 0));
-        linePositions.Add(new Vector3(heightDifference, 1 * unitSize, 0));
+        linePositions.Add((transform.FindChild("ConnectionNode").gameObject));
+        linePositions.Add(new GameObject());
+        /*linePositions.Add(new Vector3(heightDifference, 1 * unitSize, 0));
         linePositions.Add(new Vector3(heightDifference, (2 + cornerDifference) * unitSize, 0));
         linePositions.Add(new Vector3(-2 * heightDifference, (2 + cornerDifference) * unitSize, 0));
         linePositions.Add(new Vector3(-2 * heightDifference, (2 + cornerDifference) * unitSize, unitSize));
         //ConvertCoordinateToCubeCoord(new Vector3(0,-unitSize,0));
-        UpdateList();
+        //UpdateList();*/
 	}
 	
 	// Update is called once per frame
 	void Update () {
-
+        /*
         Ray forwardRay = new Ray(transform.position + (transform.up * verticalAdjust), transform.right);
         RaycastHit rayInfo = new RaycastHit();
         if (Physics.Raycast(forwardRay, out rayInfo, 100f))
@@ -69,26 +73,27 @@ public class EmitterScript : MonoBehaviour {
             
             receiver.GetComponent<ReceiverScript>().received = false;
             //receiver = null;
-        }
-
-        if (Input.GetKeyDown(KeyCode.D))
+        }*/
+        
+        if(simulatedController  != null && drawing)
         {
-            //Debug.Log("attempt to draw");
-            DrawLine(GetComponent<FixRotation>().face , simulatedController.transform.position);
+            FollowController();
         }
 
-        if (Input.GetKeyDown(KeyCode.A))
+        if (!drawing)
         {
-            simulatedController = GameObject.Find("TestCursor");
+            linePositions.Remove(simulatedController);
         }
 
-        Vector3[] positions = linePositions.ToArray();
-        //.Log(positions);
-        emitter.GetComponent<LineRenderer>().numPositions = positions.Length;
-        emitter.GetComponent<LineRenderer>().SetPositions(positions);
-        //UpdateList();
+        if(linePositions.Count > 0)
+        {
+            UpdateList();
+            CheckCompletions();
+        }
+       
+      
     }
-
+    /*
     public void UpdateList()
     {
         linePositionsOnGrid.Clear();
@@ -98,7 +103,7 @@ public class EmitterScript : MonoBehaviour {
         }
 
     }
-
+    
     public Vector3 ConvertCoordinateToCubeCoord(Vector3 laserCoord)
     {
         Vector3 returnVector = -Vector3.one;
@@ -159,7 +164,8 @@ public class EmitterScript : MonoBehaviour {
         //Debug.Log(returnVector);
         return returnVector;
     }
-
+    
+    
     //Computes the necessary distances based on the coordinates we are on. Position is the controller's current position.
     public float[] ComputeDistances(FixRotation.Face face, Vector3 position)
     {
@@ -201,10 +207,10 @@ public class EmitterScript : MonoBehaviour {
 
         float[] returnArray = { distanceToForward, distanceToBackward, distanceToRight, distanceToLeft, distanceToOutside, distanceToInside };
         return returnArray;
-
+        
 
     }
-
+    
     //Return a list that shows which faces in relation to a single face are on the Z-axis
     public FixRotation.Face ReturnOppositeFace (FixRotation.Face face)
     {
@@ -273,106 +279,118 @@ public class EmitterScript : MonoBehaviour {
             default: return returnVector;
         }
 
+    }*/
+
+    //Check for completions
+    public void CheckCompletions()
+    {
+        foreach(GameObject node in linePositions)
+        {
+            if(node.transform.parent != null)
+            {
+                //Debug.Log(node.transform.parent.name);
+                if (node.transform.parent.name.Contains("Receiver"))
+                {
+                    //Debug.Log("Went through");
+                    node.transform.parent.FindChild("Receiver").GetComponent<ReceiverScript>().receivedLaserColor = laserColor;
+                    node.transform.parent.FindChild("Receiver").GetComponent<ReceiverScript>().received = true;
+                }
+            }
+           
+        }
+    }
+    
+    //Update the list
+    public void UpdateList()
+    {
+        Vector3[] lrPositions;
+        int i = 0;
+        lrPositions = new Vector3[linePositions.Count];
+        foreach(GameObject node in linePositions)
+        {
+            lrPositions[i] = node.transform.position;
+          
+            if(i != linePositions.Count - 1)
+            {
+                lrPositions[i] += node.transform.up * 0.33f;
+            }
+            lrPositions[i] = emitter.transform.InverseTransformPoint(lrPositions[i]);
+
+            i++;
+        }
+
+        emitter.GetComponent<LineRenderer>().numPositions = lrPositions.Length;
+        emitter.GetComponent<LineRenderer>().SetPositions(lrPositions);
     }
 
-    //Draws the line forward by adding to the LineRenderer positions. Uses the face to determine how to add the nodes.
-    public void DrawLine(FixRotation.Face face, Vector3 position)
+    //Follow the controller.
+    public void FollowController()
     {
-        Vector3 controllerDirection = ApproximatePosition(face, position);
-        Debug.Log("Controller direction: " + controllerDirection);
-        Vector3 newLinePosition = Vector3.zero;
+        linePositions[linePositions.Count - 1] = simulatedController;
+    }
 
-        //Set the position usng the approximated direction.
-        //This will only set the variable to the addition vector we will need to add to the last known position.
-        //Note: 0, -2, 0 is actually forward. 
-        if(controllerDirection == Vector3.forward)
+    //Add a position to the line
+    public void AddLineNode(GameObject node)
+    {
+        //Only add it if it is a valid position.
+        if (CheckViableNode(node))
         {
-            newLinePosition = new Vector3(0, unitSize, 0);
-        }
-        else if(controllerDirection == Vector3.back)
-        {
-            newLinePosition = new Vector3(0, -unitSize, 0);
-        }
-        else if(controllerDirection == Vector3.right)
-        {
-            newLinePosition = new Vector3(0, 0, 2 * unitSize);
-        }
-        else if(controllerDirection == Vector3.left)
-        {
-            newLinePosition = new Vector3(0, 0, 2 * -unitSize);
-        }
-        else
-        {
-            Debug.Log("None were selected");
-        }
-
-        Vector3 lastPosition = linePositions[linePositions.Count - 1];
-        Vector3 difference = Vector3.zero;
-        if(linePositions.Count > 2)
-        {
-            difference = lastPosition - linePositions[linePositions.Count - 2];  
-        }
-
-        //Combine the two vectors. If the x value has changed then we are moving in the x axis, and so on.
-        Vector3 comparisonVector = difference + newLinePosition;
-        Vector3 proposedCubeCoordinate = ConvertCoordinateToCubeCoord(newLinePosition);
-        if(comparisonVector.x != newLinePosition.x)
-        {
-            //If it is greater we are moving towards the emitter's face, else we are moving deeper into the cube
-            if(comparisonVector.x > newLinePosition.x)
-            {
-
-            }
-            else
-            {
-
-            }
-        }
-        else if(comparisonVector.y != newLinePosition.y)
-        {
-            //If it is greater, we are moving forwards along the x axis, else backwards.
-            if(comparisonVector.y > newLinePosition.y)
-            {
-
-            }
-            else
-            {
-
-            }
-        }
-        else if(comparisonVector.z != newLinePosition.z)
-        {
-            //If it is greater we are moving to the right, else we are moving to the left.
-            if(comparisonVector.z > newLinePosition.z)
-            {
-
-            }
-            else
-            {
-
-            }
-        }
-
-
-        Debug.Log("Initial " + newLinePosition);
-        newLinePosition += lastPosition;
-        Debug.Log("Attempting to add: " + newLinePosition);
-        if (CheckViablePosition(newLinePosition))
-        {
-            linePositions.Add(newLinePosition);
+            //Add a Vector. It doesn't matter what value it is since the top level of the list is always connectede to the controller.
+            linePositions.Add(node);
+            //Set the vector before as the target position.
+            linePositions[linePositions.Count - 2] = node;
         }
     }
 
     //Check if the position is invalid.
-    //Case 0: Position has already been used. Laser can't go backwards.
-    public bool CheckViablePosition(Vector3 position)
+    //Case 0: Node has already been used.
+    //Case 1: Something is between our last node and this one.
+    //Case 2: Node is not directly next to the previous node.
+    public bool CheckViableNode(GameObject node)
     {
-        for(int i = 0; i < linePositions.Count; i++)
+
+        //Case 0: Node has already been used.
+        for (int i = 0; i < linePositions.Count; i++)
         {
-            if(position == linePositions[i])
+            if (node == linePositions[i])
             {
                 return false;
             }
+        }
+
+        //Case 1: A wall/rubber is between us and the next node.
+        GameObject lastObject = linePositions[linePositions.Count - 2];
+        Debug.Log(lastObject);
+        Vector3 targetDirection = (lastObject.transform.position + lastObject.transform.up * 0.33f) - (node.transform.position + node.transform.up * 0.33f);
+        Ray targetRay = new Ray(node.transform.position + node.transform.up * 0.33f, targetDirection);
+        Debug.DrawRay(node.transform.position + node.transform.up * 0.33f, targetDirection, Color.red, 10f);
+        RaycastHit hitInfo = new RaycastHit();
+        if(Physics.Raycast(targetRay, out hitInfo, (lastObject.transform.position - node.transform.position).magnitude ,checkLayerMask))
+        {
+            //Debug.Log(hitInfo.collider.name);
+            if(hitInfo.collider.name.Contains("Wall") || hitInfo.collider.name.Contains("Rubber"))
+            {
+                //Debug.Log("Detected a wall/rubber between." + hitInfo.collider.name);
+                return false;
+            }
+        }
+
+        //Case 2: Node is not directly next to previous node.
+        //Previous node. Not the last node since that one is the cursor.
+        Vector3 lastPosition = linePositions[linePositions.Count - 2].transform.position;
+        Vector3 difference = lastPosition - node.transform.position;
+        float distance = difference.magnitude;
+        //distance = Mathf.Round(distance);
+
+        if (distance < 0.95 || distance > 1.05)
+        {
+            //Vertex node
+            if(distance > 0.45 && distance < 0.55)
+            {
+                return true;
+            }
+           Debug.Log(distance + " " + difference);
+           return false;
         }
         return true;
     }
