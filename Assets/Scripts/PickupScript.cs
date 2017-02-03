@@ -2,62 +2,27 @@
 
 public class PickupScript : MonoBehaviour
 {
-    private SteamVR_TrackedController _controller;
-    private PrimitiveType _currentPrimitiveType = PrimitiveType.Sphere;
+    public SteamVR_TrackedObject trackedObj;
+    public SteamVR_Controller.Device controller;
 
-    private void OnEnable()
+    void Start()
     {
-        _controller = GetComponent<SteamVR_TrackedController>();
-        _controller.TriggerClicked += HandleTriggerClicked;
-        _controller.PadClicked += HandlePadClicked;
+        trackedObj = GetComponent<SteamVR_TrackedObject>();
     }
 
-    private void OnDisable()
+    void Update()
     {
-        _controller.TriggerClicked -= HandleTriggerClicked;
-        _controller.PadClicked -= HandlePadClicked;
-    }
+        controller = SteamVR_Controller.Input((int)trackedObj.index);
+        if(controller.GetAxis().x != 0 || controller.GetAxis().y != 0)
+        {
+            Debug.Log("X Axis is " + controller.GetAxis().x + " and Y axis is " + controller.GetAxis().y);
+        }
 
-    #region Primitive Spawning
-    private void HandleTriggerClicked(object sender, ClickedEventArgs e)
-    {
-        SpawnCurrentPrimitiveAtController();
-        Debug.Log("Firing from the Pickup Script as well");
-    }
+        if (controller.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
+        {
+            Debug.Log("Trigger Pressed");
+            controller.TriggerHapticPulse(700);
+        }
 
-    private void SpawnCurrentPrimitiveAtController()
-    {
-        var spawnedPrimitive = GameObject.CreatePrimitive(_currentPrimitiveType);
-        spawnedPrimitive.transform.position = transform.position;
-        spawnedPrimitive.transform.rotation = transform.rotation;
-
-        spawnedPrimitive.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-        if (_currentPrimitiveType == PrimitiveType.Plane)
-            spawnedPrimitive.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
     }
-    #endregion
-
-    #region Primitive Selection
-    private void HandlePadClicked(object sender, ClickedEventArgs e)
-    {
-        if (e.padY < 0)
-            SelectPreviousPrimitive();
-        else
-            SelectNextPrimitive();
-    }
-
-    private void SelectNextPrimitive()
-    {
-        _currentPrimitiveType++;
-        if (_currentPrimitiveType > PrimitiveType.Quad)
-            _currentPrimitiveType = PrimitiveType.Sphere;
-    }
-
-    private void SelectPreviousPrimitive()
-    {
-        _currentPrimitiveType--;
-        if (_currentPrimitiveType < PrimitiveType.Sphere)
-            _currentPrimitiveType = PrimitiveType.Quad;
-    }
-    #endregion
 }
