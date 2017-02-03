@@ -6,9 +6,10 @@ public class EmitterScript : MonoBehaviour {
 
     LineRenderer lr;
 
-    public enum LaserColor { Red, Blue };
+    public enum LaserColor { Red, Blue, Yellow, Pink, Magenta, Green, Grey, Cyan, Brown, Purple, Orange};
 
     public LaserColor laserColor = LaserColor.Blue;
+    private Color laserPigment;
     float verticalAdjust = 0.5f;
 
     public GameObject simulatedController;
@@ -25,12 +26,14 @@ public class EmitterScript : MonoBehaviour {
     private Vector3 laserOriginCoordinate;
 
     public LayerMask checkLayerMask;
-    public bool drawing = false;
+    public bool drawing = false, connected = false;
 
     private float heightFactor = 0.33f, puzzleScale = 1.0f;
+    private PuzzleManager manager;
 
 	// Use this for initialization
 	void Start () {
+        manager = transform.root.GetComponent<PuzzleManager>();
         lr = transform.FindChild("LaserRenderer").GetComponent<LineRenderer>();
         lr.GetComponent<LineRenderer>().startWidth *= puzzleScale;
         lr.GetComponent<LineRenderer>().endWidth *= puzzleScale;
@@ -47,12 +50,18 @@ public class EmitterScript : MonoBehaviour {
         //Initialize the emitter.
       
         puzzleScale = transform.root.lossyScale.x;
+        SetLaserPigment(manager.GetLaserPigment(laserColor)/4);
     
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        
+
+        if (manager.editor)
+        {
+            SetLaserPigment(manager.GetLaserPigment(laserColor));
+        }
+
         if(drawing)
         {
             FollowController();
@@ -67,6 +76,25 @@ public class EmitterScript : MonoBehaviour {
       
     }
 
+
+    //Colors: Red, Blue, Yellow, Pink,  Magenta, Green, Grey, Cyan, Brown, Purple, Orange
+    void SetLaserPigment(Color color)
+    {
+        if (drawing || connected)
+        {
+            laserPigment = color;
+            lr.material.color = laserPigment;
+            transform.FindChild("StandinModel").GetComponent<Renderer>().material.color = laserPigment;
+        }
+        else
+        {
+            laserPigment = color/4;
+            lr.material.color = laserPigment;
+            transform.FindChild("StandinModel").GetComponent<Renderer>().material.color = laserPigment;
+        }
+     
+    }
+
     //Call this method to start drawing.
     public void StartDraw(GameObject controller)
     {
@@ -76,6 +104,8 @@ public class EmitterScript : MonoBehaviour {
         linePositions.Clear();
         linePositions.Add((transform.FindChild("ConnectionNode").gameObject));
         linePositions.Add(new GameObject());
+        //SetLaserPigment(manager.GetLaserPigment(laserColor));
+
     }
 
     //Call this method to end drawing.
@@ -83,6 +113,7 @@ public class EmitterScript : MonoBehaviour {
     {
         linePositions.Remove(simulatedController);
         drawing = false;
+        //SetLaserPigment(manager.GetLaserPigment(laserColor) / 4);
     }
 
     //Check for completions
@@ -94,8 +125,11 @@ public class EmitterScript : MonoBehaviour {
             if (obj.transform.GetComponent<ConnectedInfo>() != null)
             {
                 //Debug.Log("Went through");
-                obj.transform.GetComponent<ConnectedInfo>().receivedLaserColor = laserColor;
+                connected = true;
+                obj.transform.GetComponent<ConnectedInfo>().receivedLaserColor = laserColor;            
+                obj.transform.GetComponent<ConnectedInfo>().receivedRGBColor = laserPigment;
                 obj.transform.GetComponent<ConnectedInfo>().received = true;
+
             }
            
         }

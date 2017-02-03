@@ -146,6 +146,64 @@ public class PuzzleManager : MonoBehaviour {
         }
     }
 
+    //Colors: Red, Blue, Yellow, Pink,  Magenta, Green, Grey, Cyan, Brown, Purple, Orange
+    public Color GetLaserPigment(EmitterScript.LaserColor laserColor)
+    {
+        Color targetColor;
+        switch ((int)laserColor)
+        {
+            //Red
+            case 0:
+                targetColor = Color.red;
+                break;
+            //Blue
+            case 1:
+                targetColor = Color.blue;
+                break;
+            //Yellow
+            case 2:
+                targetColor = Color.yellow;
+                break;
+            //Pink
+            case 3:
+                targetColor = new Color32(255, 105, 180, 255);
+                break;
+            //Magenta
+            case 4:
+                targetColor = Color.magenta;
+                break;
+            //Green
+            case 5:
+                targetColor = Color.green;
+                break;
+            //Grey
+            case 6:
+                targetColor = Color.grey;
+                break;
+            //Cyan
+            case 7:
+                targetColor = Color.cyan;
+                break;
+            //Brown
+            case 8:
+                targetColor = new Color32(97, 65, 38, 255);
+                break;
+            //Purple
+            case 9:
+                targetColor = new Color32(76, 23, 125, 255);
+                break;
+            //Orange
+            case 10:
+                targetColor = new Color32(255, 165, 0, 255);
+                break;
+            default:
+                targetColor = Color.white;
+                Debug.Log("Invalid color attempted.");
+                break;
+        }
+        return targetColor;
+    }
+
     bool CheckAllReceiver()
     {
         bool completion = true;
