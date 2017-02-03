@@ -6,11 +6,12 @@ public class FixRotation : MonoBehaviour {
 
     public float rotationFix = 0;
     public enum Face {North, East, South, West, Bottom, Top};
-
+    public Vector3 originalRotation;
     public Face face;
 
     private float timer = 0f, waitTime = 1f;
-    public Vector3 originalRotation;
+    private bool changed = false;
+
 
     void Start()
     {
@@ -21,8 +22,10 @@ public class FixRotation : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        UseRotation(originalRotation);
-
+            if (transform.root.GetComponent<PuzzleManager>().editor)
+            {
+                UseRotation(originalRotation);
+            }
     }
 
     public void UseRotation(Vector3 originalRotation)

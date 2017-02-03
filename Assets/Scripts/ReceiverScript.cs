@@ -4,11 +4,7 @@ using UnityEngine;
 
 public class ReceiverScript : MonoBehaviour {
 
-    public bool received = false, complete = false;
-    public bool specificColor = false;
-    public EmitterScript.LaserColor laserFilter = EmitterScript.LaserColor.Blue;
-    public EmitterScript.LaserColor receivedLaserColor;
-
+    private bool complete = false;
     private int indexOnList = -1;
 	// Use this for initialization
 	void Start () {
@@ -21,29 +17,7 @@ public class ReceiverScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        //If we've received a laser
-        if (received)
-        {
-            //If we only receive a certain color
-            if (specificColor)
-            {
-                //If the received color is the same as the filter
-                if(receivedLaserColor == laserFilter)
-                {
-                    complete = true;
-                }
-            }
-            else
-            {
-                complete = true;
-            }
-        }
-        else
-        {
-            complete = false;
-        }
-
-
+        complete = transform.parent.GetComponent<ConnectedInfo>().complete;
 
         if (complete)
         {

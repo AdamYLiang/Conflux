@@ -642,6 +642,12 @@ public class CubeSpawner : MonoBehaviour {
         {
             emitters[i].linePositions.Clear();
         }
+        spawnedPrefab.GetComponent<PuzzleManager>().receiverCompletion.Clear();
+        FixRotation[] rotationFixers = spawnedPrefab.transform.GetComponentsInChildren<FixRotation>();
+        for(int i = 0; i < rotationFixers.Length; i++)
+        {
+            DestroyImmediate(rotationFixers[i]);
+        }
 
         //Replace the prefab with the modified one. Destroy the one that exists in the scene.
         PrefabUtility.ReplacePrefab(spawnedPrefab, prefab);
