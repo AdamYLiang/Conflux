@@ -105,7 +105,7 @@ public class EmitterScript : MonoBehaviour {
         linePositions.Clear();
         linePositions.Add((transform.FindChild("ConnectionNode").gameObject));
         linePositions.Add(new GameObject());
-        //SetLaserPigment(manager.GetLaserPigment(laserColor));
+        SetLaserPigment(manager.GetLaserPigment(laserColor));
 
     }
 
@@ -115,7 +115,7 @@ public class EmitterScript : MonoBehaviour {
         linePositions.Remove(simulatedController);
         drawing = false;
         simulatedController.GetComponent<DrawFromController>().emitter = null;
-        //SetLaserPigment(manager.GetLaserPigment(laserColor) / 4);
+        SetLaserPigment(manager.GetLaserPigment(laserColor));
     }
 
     //Check for completions
