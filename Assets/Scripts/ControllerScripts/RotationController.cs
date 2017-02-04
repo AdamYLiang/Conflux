@@ -27,7 +27,7 @@ public class RotationController : MonoBehaviour {
             if (isTouchingPuzzle)
             {
                 currentPuzzle.GetComponent<PuzzleManager>().play = true;
-                currentPuzzle.transform.FindChild("CubePuzzle").gameObject.SetActive(false);
+                currentPuzzle.transform.gameObject.GetComponent<BoxCollider>().enabled = false;
             }
             //Debug.Log("Trigger Pressed");
             controller.TriggerHapticPulse(700);
@@ -40,7 +40,7 @@ public class RotationController : MonoBehaviour {
             if (isTouchingPuzzle)
             {
                 currentPuzzle.GetComponent<PuzzleManager>().play = false;
-                currentPuzzle.transform.FindChild("CubePuzzle").gameObject.SetActive(true);
+                currentPuzzle.transform.gameObject.GetComponent<BoxCollider>().enabled = true;
                 isTouchingPuzzle = false;
                 currentPuzzle = null;
             }
