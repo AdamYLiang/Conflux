@@ -18,6 +18,9 @@ public class PickupScript : MonoBehaviour
             Debug.Log("X Axis is " + controller.GetAxis().x + " and Y axis is " + controller.GetAxis().y);
         }
 
+        //StartDraw and EndDraw to hook up on this
+        //Rotation set when trigger pressed on play
+
         if (controller.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
         {
             Debug.Log("Trigger Pressed");
