@@ -6,8 +6,8 @@ public class RotationController : MonoBehaviour {
 
     public SteamVR_TrackedObject trackedObj;
     public SteamVR_Controller.Device controller;
-    public bool isTouchingPuzzle;
-    public GameObject currentPuzzle;
+    public bool isTouchingPuzzle; //Checks to see you are touching a puzzle based on collider
+    public GameObject currentPuzzle; // Registers current touched puzzle
 
     // Use this for initialization
     void Start () {
@@ -20,8 +20,10 @@ public class RotationController : MonoBehaviour {
 
         controller = SteamVR_Controller.Input((int)trackedObj.index);
 
+        //If you press the button
         if (controller.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
         {
+            //And you are touching a button, set it to play and deactivate the box collider
             if (isTouchingPuzzle)
             {
                 currentPuzzle.GetComponent<PuzzleManager>().play = true;
@@ -31,8 +33,10 @@ public class RotationController : MonoBehaviour {
             controller.TriggerHapticPulse(700);
         }
 
+        //If button is released
         if (controller.GetPressUp(SteamVR_Controller.ButtonMask.Trigger))
         {
+            //And you are touching a puzzle, set play to false and turn on the collider, reset values
             if (isTouchingPuzzle)
             {
                 currentPuzzle.GetComponent<PuzzleManager>().play = false;

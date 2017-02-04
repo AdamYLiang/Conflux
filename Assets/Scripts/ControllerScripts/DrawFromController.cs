@@ -5,18 +5,21 @@ using UnityEngine;
 public class DrawFromController : MonoBehaviour {
 
     public GameObject emitter;
+    public SteamVR_Controller.Device mainController;
+    public SteamVR_TrackedObject trackedObj;
 
-	// Use this for initialization
-	void Start () {
-		
+    // Use this for initialization
+    void Start () {
+        trackedObj = transform.parent.GetComponent<SteamVR_TrackedObject>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-
-        if (Input.GetKeyDown(KeyCode.Z))
+        mainController = SteamVR_Controller.Input((int)trackedObj.index);
+        if (mainController.GetPressUp(SteamVR_Controller.ButtonMask.Trigger))
         {
-            if(emitter != null)
+            transform.localScale = new Vector3(0.17f, 0.17f, 0.17f);
+            if (emitter != null)
             {
                 emitter.GetComponent<EmitterScript>().EndDraw();
                 emitter = null;
@@ -33,8 +36,9 @@ public class DrawFromController : MonoBehaviour {
             if(col.gameObject.transform.parent.name.Contains("Emitter"))
             {
                 //Press a key and set our new draw origin to here.
-                if (Input.GetKeyDown(KeyCode.X) && col.gameObject.transform.root.GetComponent<PuzzleManager>().play)
+                if (mainController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) && col.gameObject.transform.root.GetComponent<PuzzleManager>().play)
                 {
+                    transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
                     emitter = col.gameObject.transform.parent.gameObject;
                     emitter.GetComponent<EmitterScript>().StartDraw(gameObject);
                 }
