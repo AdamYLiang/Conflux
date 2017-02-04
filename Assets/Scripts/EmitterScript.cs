@@ -34,6 +34,7 @@ public class EmitterScript : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         manager = transform.root.GetComponent<PuzzleManager>();
+        puzzleScale = transform.root.lossyScale.x;
         lr = transform.FindChild("LaserRenderer").GetComponent<LineRenderer>();
         lr.GetComponent<LineRenderer>().startWidth *= puzzleScale;
         lr.GetComponent<LineRenderer>().endWidth *= puzzleScale;
@@ -113,6 +114,7 @@ public class EmitterScript : MonoBehaviour {
     {
         linePositions.Remove(simulatedController);
         drawing = false;
+        simulatedController.GetComponent<DrawFromController>().emitter = null;
         //SetLaserPigment(manager.GetLaserPigment(laserColor) / 4);
     }
 
@@ -189,6 +191,10 @@ public class EmitterScript : MonoBehaviour {
             //If it is the type of component we need to keep track of, add it to the list.
             if(node.transform.parent.tag == "Tracked")
             {
+                if (node.transform.parent.name.Contains("Receiver"))
+                {
+                    EndDraw();
+                }
                 connectedObjects.Add(node.transform.parent.gameObject);
             }
 

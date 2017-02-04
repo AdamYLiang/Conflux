@@ -648,6 +648,7 @@ public class CubeSpawner : MonoBehaviour {
         {
             DestroyImmediate(rotationFixers[i]);
         }
+        spawnedPrefab.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
 
         //Replace the prefab with the modified one. Destroy the one that exists in the scene.
         PrefabUtility.ReplacePrefab(spawnedPrefab, prefab);
