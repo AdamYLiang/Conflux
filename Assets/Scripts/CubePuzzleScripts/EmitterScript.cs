@@ -6,7 +6,7 @@ public class EmitterScript : MonoBehaviour {
 
     LineRenderer lr;
 
-    public enum LaserColor { Red, Blue, Yellow, Pink, Magenta, Green, Grey, Cyan, Brown, Purple, Orange};
+    public enum LaserColor { Red, Blue, Yellow, Pink, Magenta, Green, Grey, Cyan, Brown, Purple, Orange, None};
 
     public LaserColor laserColor = LaserColor.Blue;
     private Color laserPigment;

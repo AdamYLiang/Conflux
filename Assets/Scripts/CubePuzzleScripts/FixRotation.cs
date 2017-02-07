@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class FixRotation : MonoBehaviour {
 
-    public float rotationFix = 0;
-    public enum Face {North, East, South, West, Bottom, Top};
+    public float rotationFix;
+    [System.Serializable]
+    public enum Face {North, East, South, West, Bottom, Top, All};
     public Vector3 originalRotation;
     public Face face;
 
@@ -26,6 +27,20 @@ public class FixRotation : MonoBehaviour {
             {
                 UseRotation(originalRotation);
             }
+    }
+
+    public void SetOriginal(Vector3 Rotation)
+    {
+        originalRotation = Rotation;
+    }
+
+    public void UpdateRotation()
+    {
+        if (transform.name.Contains("Wall"))
+        {
+            transform.GetChild(0).GetComponent<WallBlockRotation>().Apply();
+        }
+        UseRotation(originalRotation);
     }
 
     public void UseRotation(Vector3 originalRotation)

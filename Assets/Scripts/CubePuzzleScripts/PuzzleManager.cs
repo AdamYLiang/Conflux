@@ -12,33 +12,29 @@ public class PuzzleManager : MonoBehaviour {
     public bool hidden = false;
     public Color uncompleteColor, completeColor;
     public float colorChangeSpeed = 3f;
+    public MeshRenderer targetRenderer;
 
     private bool allActive = true;
     private Light glow;
     private bool changing = false, color1 = false, color2 = true;
     private float colorChangeTimer = 0f; 
     private Transform playTiles;
-    private Color  targetColor;
-    private MeshRenderer targetRenderer;
+    private Color targetColor, currentColor;
+ 
 
     void Start()
     {
         glow = transform.FindChild("Glow").GetComponent<Light>();
         glow.color = uncompleteColor;
-        playTiles = transform.GetChild(0);
-        for (int i = 0; i < playTiles.childCount; i++)
-        {
-            if (playTiles.GetChild(i).GetComponent<MeshRenderer>() != null)
-            {
-                targetRenderer = playTiles.GetChild(i).GetComponent<MeshRenderer>();
-                i = playTiles.childCount;
-            }
-        }
+        playTiles = transform.FindChild("PlayTiles");
+        
         SetAllColor(uncompleteColor);
     }
 
 	// Update is called once per frame
 	void Update () {
+
+
 
         if (hidden)
         {
@@ -47,7 +43,50 @@ public class PuzzleManager : MonoBehaviour {
         else
         {
             ShowCube();
+            if (targetRenderer == null)
+            {
+                targetRenderer = playTiles.GetChild(0).GetComponent<MeshRenderer>();
+                SetAllColor(uncompleteColor);
+            }
+            else
+            {
+                //Debug.Log(targetRenderer);
+                if (finished && targetRenderer.material.color == uncompleteColor && !changing)
+                {
+                    targetColor = completeColor;
+                    colorChangeTimer = 0;
+                    changing = true;
+                }
 
+                if (!finished && targetRenderer.material.color == completeColor && !changing)
+                {
+                    targetColor = uncompleteColor;
+                    colorChangeTimer = 0;
+                    changing = true;
+                }
+
+                if (changing)
+                {
+                    float step = Time.deltaTime / colorChangeSpeed;
+                    Color originalColor;
+                    if (targetColor == completeColor)
+                    {
+                        originalColor = uncompleteColor;
+                    }
+                    else
+                    {
+                        originalColor = completeColor;
+                    }
+                    colorChangeTimer += step;
+                    SetAllColor(Color.Lerp(originalColor, targetColor, colorChangeTimer));
+                    glow.color = Color.Lerp(originalColor, targetColor, colorChangeTimer);
+                    //currentColor = glow.color;
+                    if (colorChangeTimer >= 1.0f)
+                    {
+                        changing = false;
+                    }
+                }
+            }
             if (play)
             {
                 finished = CheckAllReceiver();
@@ -55,41 +94,6 @@ public class PuzzleManager : MonoBehaviour {
             else if(!play && !editor)
             {
                  transform.Rotate(new Vector3(Random.Range(10, 20), Random.Range(10, 20), Random.Range(10, 20)) * Time.deltaTime);
-            }
-
-            if (finished && targetRenderer.material.color == uncompleteColor && !changing)
-            {
-                targetColor = completeColor;
-                colorChangeTimer = 0;
-                changing = true;
-            }
-
-            if (!finished && targetRenderer.material.color == completeColor && !changing)
-            {
-                targetColor = uncompleteColor;
-                colorChangeTimer = 0;
-                changing = true;
-            }
-
-            if (changing)
-            {
-                float step = Time.deltaTime / colorChangeSpeed;
-                Color originalColor;
-                if (targetColor == completeColor)
-                {
-                    originalColor = uncompleteColor;
-                }
-                else
-                {
-                    originalColor = completeColor;
-                }
-                colorChangeTimer += step;
-                SetAllColor(Color.Lerp(originalColor, targetColor, colorChangeTimer));
-                glow.color = Color.Lerp(originalColor, targetColor, colorChangeTimer);
-                if (colorChangeTimer >= 1.0f)
-                {
-                    changing = false;
-                }
             }
 
             if (!play && !editor)

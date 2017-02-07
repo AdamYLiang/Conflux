@@ -7,28 +7,22 @@ using UnityEditor;
 
 public class CubeSpawner : MonoBehaviour {
 
+    public bool spawned = false;
+
     public List<GameObject> Tiles;
 
     public GameObject wallTile;
 
     [SerializeField]
-    public FaceInfo northFace = new FaceInfo(), 
-        eastFace = new FaceInfo(), southFace = new FaceInfo(), 
-        westFace = new FaceInfo(), bottomFace = new FaceInfo(), 
-        topFace = new FaceInfo();
-
-    [System.NonSerialized]
-    public FaceInfo[] faceBlocks;
-
-    public FixRotation.Face selectedFace;
-
+    public PuzzleEditor puzzleEditor = new PuzzleEditor();
+   
 	// Use this for initialization
 	void Start () {
-        faceBlocks = new FaceInfo[6];
-        faceBlocks[0] = northFace; faceBlocks[1] = eastFace; faceBlocks[2] = southFace; faceBlocks[3] = westFace;
-        faceBlocks[4] = bottomFace; faceBlocks[5] = topFace;
         retrieveCube(new Vector3(0, 0, 0));
-        PlaceCubes();
+        if (!spawned)
+        {
+            PlaceCubes();
+        }
 	}
 	
 	// Update is called once per frame
@@ -256,6 +250,8 @@ public class CubeSpawner : MonoBehaviour {
     //Loads tiles on every face
     public void PlaceCubes()
     {
+        puzzleEditor.UpdatePuzzleEditor();
+        spawned = true;
         //Iterate through every coordinate in our cube.
         for (int i = 0; i < 5; i++)
         {
@@ -288,7 +284,10 @@ public class CubeSpawner : MonoBehaviour {
                             info = coordinates[m];
 
                             //Get the tile number we need to spawn.
-                            int value = faceBlocks[(int)info.x].faceBlocks[(int)info.z].row[(int)info.y];
+                            
+                            int value = puzzleEditor.faceBlocks[(int)info.x].faceBlocks[(int)info.z].row[(int)info.y];
+
+
                             //If the value isn't a valid prefab, don't do anything and tell the user.
                             if (value >= 0 && value < Tiles.Count)
                             {
@@ -309,7 +308,7 @@ public class CubeSpawner : MonoBehaviour {
                             }
                             
                             //Find out how many walls we need to spawn here, then call the necessary function.
-                            FaceInfo.WallNumber blocks = faceBlocks[(int)info.x].faceBlocks[(int)info.z].blocked[(int)info.y];
+                            FaceInfo.WallNumber blocks = puzzleEditor.faceBlocks[(int)info.x].faceBlocks[(int)info.z].blocked[(int)info.y];
                             SpawnWallsOnCoordinate(blocks, info, cube);
                         }
                     }  
@@ -332,8 +331,8 @@ public class CubeSpawner : MonoBehaviour {
                 Quaternion rotation = Quaternion.Euler(CalculateRotation((int)info.x));
                 Vector3 position = CalculateRelativePosition((int)info.x);
                 GameObject temp = Instantiate(wallTile, cube.transform.position + position, rotation);
+                //temp.GetComponent<FixRotation>().rotationFix = rotationFix;
                 ModifyObject(temp, info, rotationFix, rotation);
-                temp.transform.GetChild(0).GetComponent<WallBlockRotation>().enabled = false;
                 rotationFix += 90f;
             }
 
@@ -346,8 +345,13 @@ public class CubeSpawner : MonoBehaviour {
         temp.transform.parent = transform.FindChild("PlayTiles");
         temp.GetComponent<FixRotation>().face = (FixRotation.Face)info.x;
         temp.GetComponent<FixRotation>().rotationFix = rotationFix;
-        temp.GetComponent<FixRotation>().UseRotation(rotation.eulerAngles);
-        temp.GetComponent<FixRotation>().originalRotation = rotation.eulerAngles;
+        temp.GetComponent<FixRotation>().SetOriginal(rotation.eulerAngles);
+        if (temp.name.Contains("Wall"))
+        {
+            temp.transform.GetChild(0).GetComponent<WallBlockRotation>().fixRotation = rotationFix;
+        }
+        temp.GetComponent<FixRotation>().UpdateRotation();
+        temp.GetComponent<TileUpdater>().puzzleEditor = this;
     }
 
     //Returns a float to use as the rotation fix depending on whether or not it is an edge/vertex coordinate.
@@ -447,6 +451,7 @@ public class CubeSpawner : MonoBehaviour {
     public void RefreshCube()
     {
         GetComponent<PuzzleManager>().EmptyList();
+        spawned = false;
         RemoveTiles();
         PlaceCubes();
     }
@@ -456,9 +461,9 @@ public class CubeSpawner : MonoBehaviour {
     {
         Transform tiles = transform.FindChild("PlayTiles");
         //Debug.Log(tiles.childCount);
-        for(int i = 0; i < tiles.childCount; i++)
+        for(int i = tiles.childCount - 1; i >= 0; i--)
         {
-            Destroy(tiles.GetChild(i).gameObject);
+            DestroyImmediate(tiles.GetChild(i).gameObject);
         }
     }
 
@@ -466,14 +471,26 @@ public class CubeSpawner : MonoBehaviour {
     public void RemoveTilesOnFace(FixRotation.Face face)
     {
         Transform tiles = transform.FindChild("PlayTiles");
-        for(int i = 0; i < tiles.childCount; i++)
+        if(face != FixRotation.Face.All)
         {
-            if(tiles.GetChild(i).GetComponent<FixRotation>().face == face)
+            for (int i = tiles.childCount - 1; i >= 0; i--)
             {
-                Destroy(tiles.GetChild(i).gameObject);
-                
+                if (tiles.GetChild(i).GetComponent<FixRotation>().face == face)
+                {
+                    DestroyImmediate(tiles.GetChild(i).gameObject);
+
+                }
             }
         }
+        else
+        {
+            for (int i = tiles.childCount - 1; i >= 0; i--)
+            {
+                DestroyImmediate(tiles.GetChild(i).gameObject);
+            }
+            spawned = false;
+        }
+       
     }
 
     //Retrieve the cube using the coordinates.
@@ -515,27 +532,31 @@ public class CubeSpawner : MonoBehaviour {
         FaceInfo faceBlocks;
         switch ((int)face)
         {
+            //All faces
             case 0:
-                faceBlocks = northFace;
+                faceBlocks = puzzleEditor.northFace;
                 break;
             case 1:
-                faceBlocks = eastFace;
+                faceBlocks = puzzleEditor.eastFace;
                 break;
             case 2:
-                faceBlocks = southFace;
+                faceBlocks = puzzleEditor.southFace;
                 break;
             case 3:
-                faceBlocks = westFace;
+                faceBlocks = puzzleEditor.westFace;
                 break;
             case 4:
-                faceBlocks = bottomFace;
+                faceBlocks = puzzleEditor.bottomFace;
                 break;
             case 5:
-                faceBlocks = topFace;
+                faceBlocks = puzzleEditor.topFace;
+                break;
+            case 6:
+                faceBlocks = null;
                 break;
             default:
-                Debug.Log("Something bad happened in ResetFaceBlocks");
                 faceBlocks = null;
+                Debug.Log("Error");
                 break;
         }
         return faceBlocks;
@@ -545,7 +566,11 @@ public class CubeSpawner : MonoBehaviour {
     public void ResetFaceBlocks(FixRotation.Face face)
     {
         FaceInfo faceBlocks = GetFaceBlocks(face);
-        if(faceBlocks != null)
+        if(faceBlocks == null)
+        {
+            ResetArray();
+        }
+        else if(faceBlocks != null)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -562,8 +587,12 @@ public class CubeSpawner : MonoBehaviour {
     public void SpawnWalls(FixRotation.Face face)
     {
         FaceInfo faceBlocks = GetFaceBlocks(face);
-
-        if(faceBlocks != null)
+        if (faceBlocks == null)
+        {
+            SpawnWallsAllFaces();
+            return;
+        }
+        else if (faceBlocks != null)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -609,9 +638,14 @@ public class CubeSpawner : MonoBehaviour {
     public void SpawnRubberOnFace(FixRotation.Face face)
     {
         FaceInfo faceBlocks = GetFaceBlocks(face);
-
-        if (faceBlocks != null)
+        if(faceBlocks == null)
         {
+            SpawnRubberAllFaces();
+            return;
+        }
+        else if (faceBlocks != null)
+        {
+            //Debug.Log(face + " " + faceBlocks);
             for (int i = 0; i < 5; i++)
             {
                 for (int j = 0; j < 5; j++)
@@ -622,17 +656,45 @@ public class CubeSpawner : MonoBehaviour {
         }
     }
 
+    //Save as editable cube.
+    public void SaveAsEditableCube(Transform transform)
+    {
+        Object prefab = PrefabUtility.CreateEmptyPrefab("Assets/Puzzles/Editable/" + transform.name + ".prefab");
+       
+        string original = transform.name; string searchName = transform.name;
+        transform.name = transform.name + "Original";
+
+        PrefabUtility.ReplacePrefab(transform.gameObject, prefab);
+        PrefabUtility.InstantiatePrefab(prefab);
+
+        //Can't cast the instantiation so we can just find it again after spawning.
+        GameObject spawnedPrefab = GameObject.Find(searchName);
+        spawnedPrefab.GetComponent<CubeSpawner>().spawned = true;
+        EmitterScript[] emitters = spawnedPrefab.transform.GetComponentsInChildren<EmitterScript>();
+        for (int i = 0; i < emitters.Length; i++)
+        {
+            emitters[i].linePositions.Clear();
+        }
+        spawnedPrefab.GetComponent<PuzzleManager>().receiverCompletion.Clear();
+        //Replace the prefab with the modified one. Destroy the one that exists in the scene.
+        PrefabUtility.ReplacePrefab(spawnedPrefab, prefab);
+        DestroyImmediate(spawnedPrefab);
+        transform.name = original;
+    }
+
     //Save the object as a prefab, as well as any modifications to make it game ready.
     public void SaveAsPrefab(Transform transform)
     {
         //Workaround, make an empty prefab, replace it with our gameObject, then spawn it again, modify that, and replace it. 
         //We do this to avoid changing the one we are editing at the moment.
-        Object prefab = PrefabUtility.CreateEmptyPrefab("Assets/Puzzles/tempPuzzle.prefab");
+        Object prefab = PrefabUtility.CreateEmptyPrefab("Assets/Puzzles/Game-Ready/" + transform.name + ".prefab");
+        string original = transform.name; string searchName = transform.name;
+        transform.name = transform.name + "Original";
         PrefabUtility.ReplacePrefab(transform.gameObject, prefab);
         PrefabUtility.InstantiatePrefab(prefab);
 
         //Can't cast the instantiation so we can just find it again after spawning.
-        GameObject spawnedPrefab = GameObject.Find("tempPuzzle");
+        GameObject spawnedPrefab = GameObject.Find(searchName);
 
         //Destroy the CubeSpawner script, since it's for editting, then destroy the placeholder cubes underlying the puzzle since they are now unnecessary.
         DestroyImmediate(spawnedPrefab.GetComponent<CubeSpawner>());
@@ -649,14 +711,24 @@ public class CubeSpawner : MonoBehaviour {
             DestroyImmediate(rotationFixers[i]);
         }
         spawnedPrefab.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-
+        spawnedPrefab.transform.FindChild("Glow").GetComponent<Light>().range *= 0.1f;
         //Replace the prefab with the modified one. Destroy the one that exists in the scene.
         PrefabUtility.ReplacePrefab(spawnedPrefab, prefab);
         DestroyImmediate(spawnedPrefab);
+        transform.name = original;
+        
+    }
+
+    //Apply rotations found in fixrotation all across the cube
+    public void ApplyRotations()
+    {
+        Transform playtiles = transform.FindChild("PlayTiles");
+        for(int i = playtiles.childCount - 1; i >= 0; i--)
+        {
+            playtiles.GetChild(i).GetComponent<FixRotation>().UpdateRotation();
+        }
     }
 }
-
-
 
 [System.Serializable]
 public class FaceInfo{
@@ -670,14 +742,48 @@ public class FaceInfo{
     {
         public int[] row;
         public WallNumber[] blocked;
-    }
 
-    public rows[] faceBlocks;
+        public rows()
+        {
+            row = new int[5];
+            blocked = new WallNumber[5];
+        }
+    }
+    rows temp = new rows();
+    public rows[] faceBlocks = new rows[5] { new rows(), new rows(), new rows(), new rows(), new rows() };
 
     public FaceInfo()
     {
-        faceBlocks = new rows[5];
+        faceBlocks = new rows[5] { new rows(), new rows(), new rows(), new rows(), new rows() };
+    }
 
+}
+
+[System.Serializable]
+public class PuzzleEditor
+{
+    //The face blocks
+    [SerializeField]
+    public FaceInfo[] faceBlocks = new FaceInfo[6];
+
+    [SerializeField]
+    public FaceInfo northFace = new FaceInfo(),
+    eastFace = new FaceInfo(), southFace = new FaceInfo(),
+    westFace = new FaceInfo(), bottomFace = new FaceInfo(),
+    topFace = new FaceInfo();
+
+    //The selected face
+    public FixRotation.Face selectedFace;
+
+    public PuzzleEditor()
+    {
+        faceBlocks = new FaceInfo[6] { northFace, eastFace, southFace, westFace, bottomFace, topFace };
+        selectedFace = FixRotation.Face.All;
+    }
+
+    public void UpdatePuzzleEditor()
+    {
+        faceBlocks = new FaceInfo[6] { northFace, eastFace, southFace, westFace, bottomFace, topFace };
     }
 }
 
@@ -688,36 +794,42 @@ public class CubeSpawnerEditor : Editor
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
+        
         CubeSpawner script = (CubeSpawner)target;
+
+        if (GUILayout.Button("Update Rotations"))
+        {
+            script.ApplyRotations();
+        }
 
         if (GUILayout.Button("Make Walls on Selected Face"))
         {
-            script.SpawnWalls(script.selectedFace);
-        }
-
-        if (GUILayout.Button("Make Walls on all faces."))
-        {
-            script.SpawnWallsAllFaces();
+            script.SpawnWalls(script.puzzleEditor.selectedFace);
         }
 
         if (GUILayout.Button("Make Rubber on Selected Face"))
         {
-            script.SpawnRubberOnFace(script.selectedFace);
+            script.SpawnRubberOnFace(script.puzzleEditor.selectedFace);
         }
 
-        if (GUILayout.Button("Make Rubber on all faces."))
-        {
-            script.SpawnRubberAllFaces();
-        }
- 
         if (GUILayout.Button("Reset Selected Face"))
         {
-            script.ResetFaceBlocks(script.selectedFace);
+            script.ResetFaceBlocks(script.puzzleEditor.selectedFace);
         }
 
-        if (GUILayout.Button("Reset Whole Cube"))
+        if (GUILayout.Button("Respawn Components All"))
         {
-            script.ResetArray();
+            script.RefreshCube();
+        }
+
+        if (GUILayout.Button("Delete Components Selected Face"))
+        {
+            script.RemoveTilesOnFace(script.puzzleEditor.selectedFace);
+        }
+
+        if (GUILayout.Button("Save Puzzle"))
+        {
+            script.SaveAsEditableCube(script.transform);
         }
 
         if (GUILayout.Button("Export puzzle"))
@@ -731,11 +843,201 @@ public class CubeSpawnerEditor : Editor
 #endif
 
 #if UNITY_EDITOR
+[CustomPropertyDrawer(typeof(PuzzleEditor))]
+public class PuzzleEditorDrawer: PropertyDrawer
+{
+    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+    {
+        SerializedProperty selectedFace = property.FindPropertyRelative("selectedFace");
+        Rect newRect = position;
+       
+        int selectedIndex = selectedFace.enumValueIndex;
+
+        if (selectedIndex != (int)FixRotation.Face.All)
+        {
+            //Select the correct face
+            SerializedProperty selectedArray;
+            switch (selectedIndex)
+            {
+                case 0:
+                    selectedArray = property.FindPropertyRelative("northFace").FindPropertyRelative("faceBlocks");
+                    break;
+                case 1:
+                    selectedArray = property.FindPropertyRelative("eastFace").FindPropertyRelative("faceBlocks");
+                    break;
+                case 2:
+                    selectedArray = property.FindPropertyRelative("southFace").FindPropertyRelative("faceBlocks");
+                    break;
+                case 3:
+                    selectedArray = property.FindPropertyRelative("westFace").FindPropertyRelative("faceBlocks");
+                    break;
+                case 4:
+                    selectedArray = property.FindPropertyRelative("bottomFace").FindPropertyRelative("faceBlocks");
+                    break;
+                case 5:
+                    selectedArray = property.FindPropertyRelative("topFace").FindPropertyRelative("faceBlocks");
+                    break;
+                default:
+                    selectedArray = null;
+                    break;
+            }
+
+            if (selectedArray.arraySize != 5)
+            {
+                selectedArray.arraySize = 5;
+            }
+
+            for (int i = 4; i >= 0; i--)
+            {
+                //Find the individual row. Set the width to the width/5
+                SerializedProperty row = selectedArray.GetArrayElementAtIndex(i).FindPropertyRelative("row");
+                //Debug.Log(row.propertyPath);
+                SerializedProperty blocked = selectedArray.GetArrayElementAtIndex(i).FindPropertyRelative("blocked");
+
+                //Divide by the number of slots we want. Doubled it for empty spaces between
+                newRect.width = position.width / 10;
+
+                //Set the size to five if it isnt already.
+                if (row.arraySize != 5)
+                {
+                    row.arraySize = 5;
+                }
+
+                if (blocked.arraySize != 5)
+                {
+                    blocked.arraySize = 5;
+                }
+
+                //Iterate through the whole row
+                for (int j = 0; j < 5; j++)
+                {
+                    //Retrieve an individual element, and display it, then move slightly to the right and repeat. Multipled by two because we want gaps.
+                    //SerializedProperty value = ;
+                    newRect.height = 18f;
+                    EditorGUI.PropertyField(newRect, row.GetArrayElementAtIndex(j), GUIContent.none);
+                    newRect.x += newRect.width;
+                    EditorGUI.PropertyField(newRect, blocked.GetArrayElementAtIndex(j), GUIContent.none);
+                    newRect.x += newRect.width;
+                }
+
+                //Move vertically down for the next row, and reset the horizontal.
+                newRect.x = position.x;
+                newRect.y += 18f;
+            }
+
+        }//Draw all instead of just one face.
+        else
+        {
+
+            //Find the entire Multidimensional array
+            SerializedProperty faceBlocks;
+            
+            //Loop through array, always size five
+            for (int i = 0; i < 5; i++)
+            {
+                newRect.width = position.width;
+                switch (i)
+                {
+                    case 0:
+                        faceBlocks = property.FindPropertyRelative("northFace").FindPropertyRelative("faceBlocks");
+                        EditorGUI.LabelField(newRect, "North Face");                    
+                        break;
+                    case 1:
+                        faceBlocks = property.FindPropertyRelative("eastFace").FindPropertyRelative("faceBlocks");
+                        EditorGUI.LabelField(newRect, "East Face");
+                        break;
+                    case 2:
+                        faceBlocks = property.FindPropertyRelative("southFace").FindPropertyRelative("faceBlocks");
+                        EditorGUI.LabelField(newRect, "South Face");
+                        break;
+                    case 3:
+                        faceBlocks = property.FindPropertyRelative("westFace").FindPropertyRelative("faceBlocks");
+                        EditorGUI.LabelField(newRect, "West Face");
+                        break;
+                    case 4:
+                        faceBlocks = property.FindPropertyRelative("bottomFace").FindPropertyRelative("faceBlocks");
+                        EditorGUI.LabelField(newRect, "Bottom Face");
+                        break;
+                    case 5:
+                        faceBlocks = property.FindPropertyRelative("topFace").FindPropertyRelative("faceBlocks");
+                        EditorGUI.LabelField(newRect, "Top Face");
+                        break;
+                    default:
+                        faceBlocks = null;
+                        break;
+                }
+
+                newRect.y += 18f;
+
+                if (faceBlocks.arraySize != 5)
+                {
+                    faceBlocks.arraySize = 5;
+                }
+
+                for (int k = 4; k >= 0; k--)
+                {
+                    //Find the individual row. Set the width to the width/5
+                    SerializedProperty row = faceBlocks.GetArrayElementAtIndex(k).FindPropertyRelative("row");
+                    SerializedProperty blocked = faceBlocks.GetArrayElementAtIndex(k).FindPropertyRelative("blocked");
+
+                    //Divide by the number of slots we want. Doubled it for empty spaces between
+                    newRect.width = position.width / 10;
+
+                    //Set the size to five if it isnt already.
+                    if (row.arraySize != 5)
+                    {
+                        row.arraySize = 5;
+                    }
+
+                    if (blocked.arraySize != 5)
+                    {
+                        blocked.arraySize = 5;
+                    }
+
+                    //Iterate through the whole row
+                    for (int j = 0; j < 5; j++)
+                    {
+                        //Retrieve an individual element, and display it, then move slightly to the right and repeat. Multipled by two because we want gaps.
+                        //SerializedProperty value = ;
+                        newRect.height = 18f;
+                        EditorGUI.PropertyField(newRect, row.GetArrayElementAtIndex(j), GUIContent.none);
+                        newRect.x += newRect.width;
+                        EditorGUI.PropertyField(newRect, blocked.GetArrayElementAtIndex(j), GUIContent.none);
+                        newRect.x += newRect.width;
+                    }
+
+                    //Move vertically down for the next row, and reset the horizontal.
+                    newRect.x = position.x;
+                    newRect.y += 18f;
+                }
+               
+            }
+        }
+        newRect.height = 18f;
+        newRect.width = position.width;
+        newRect.y += 18f;
+        EditorGUI.PropertyField(newRect, selectedFace);
+    }
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+    {
+        if(property.FindPropertyRelative("selectedFace").enumValueIndex != 6)
+        {
+            return 18f * 7f;
+        }
+        else{
+            return 18f * 32f;
+        }
+    }
+}
+#endif
+
+#if UNITY_EDITOR
 [CustomPropertyDrawer(typeof(FaceInfo))]
 public class FaceInfoEditor : PropertyDrawer
 {
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
+        /*
         //Write the prefix label
         //EditorGUI.BeginProperty(position, label, property);
         EditorGUI.PrefixLabel(position, label);
@@ -746,7 +1048,7 @@ public class FaceInfoEditor : PropertyDrawer
 
         //Find the entire Multidimensional array
         SerializedProperty faceBlocks = property.FindPropertyRelative("faceBlocks");
-
+        
         //Loop through array, always size five
         for (int i = 4; i >= 0; i--)
         {
@@ -763,7 +1065,7 @@ public class FaceInfoEditor : PropertyDrawer
                 row.arraySize = 5;
             }
 
-            if(blocked.arraySize != 5)
+            if (blocked.arraySize != 5)
             {
                 blocked.arraySize = 5;
             }
@@ -783,14 +1085,15 @@ public class FaceInfoEditor : PropertyDrawer
             //Move vertically down for the next row, and reset the horizontal.
             newRect.x = position.x;
             newRect.y += 18f;
-        }
-       
+        }*/
+
+
         //EditorGUI.EndProperty();
     }
-
+    
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
-        return 18f * 7f;
+        return 7f;
     }
 }
 #endif

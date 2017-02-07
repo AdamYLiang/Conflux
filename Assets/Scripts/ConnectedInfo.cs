@@ -8,7 +8,7 @@ public class ConnectedInfo : MonoBehaviour {
     public bool specificColor = true;
     public Color receivedRGBColor, incompleteRGBColor;
     public EmitterScript.LaserColor laserFilter = EmitterScript.LaserColor.Blue;
-    public EmitterScript.LaserColor receivedLaserColor;
+    public EmitterScript.LaserColor receivedLaserColor = EmitterScript.LaserColor.None;
 
     private PuzzleManager manager;
     // Use this for initialization
