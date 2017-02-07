@@ -75,12 +75,6 @@ public class DrawFromController : MonoBehaviour {
 
                 }
 
-                //If this is a receiver, we need to end the drawing after connecting.
-                if (col.gameObject.transform.parent.name.Contains("Receiver"))
-                {
-                    emitter.GetComponent<EmitterScript>().EndDraw();
-                    emitter = null;
-                }
             }
         }
 

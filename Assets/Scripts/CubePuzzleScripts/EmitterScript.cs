@@ -115,7 +115,7 @@ public class EmitterScript : MonoBehaviour {
         linePositions.Remove(simulatedController);
         drawing = false;
         simulatedController.GetComponent<DrawFromController>().emitter = null;
-        SetLaserPigment(manager.GetLaserPigment(laserColor) / 4);
+        SetLaserPigment(manager.GetLaserPigment(laserColor));
     }
 
     //Check for completions
