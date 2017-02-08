@@ -13,6 +13,7 @@ public class PuzzleManager : MonoBehaviour {
     public Color uncompleteColor, completeColor;
     public float colorChangeSpeed = 3f;
     public MeshRenderer targetRenderer;
+    Vector3 randomRotation = new Vector3(1, 1, 1);
 
     private bool allActive = true;
     private Light glow;
@@ -93,14 +94,18 @@ public class PuzzleManager : MonoBehaviour {
             }
             else if(!play && !editor)
             {
-                 transform.Rotate(new Vector3(Random.Range(10, 20), Random.Range(10, 20), Random.Range(10, 20)) * Time.deltaTime);
+                randomRotation.x = Mathf.Clamp(randomRotation.x + Random.Range(-10f, 10f), -20, 20f);
+                randomRotation.y = Mathf.Clamp(randomRotation.y + Random.Range(-10f, 10f), -20, 20f);
+                randomRotation.z = Mathf.Clamp(randomRotation.z + Random.Range(-10f, 10f), -20, 20f);
+                GetComponent<Rigidbody>().AddForce(randomRotation);
             }
+            /*
 
             if (!play && !editor)
             {
                 transform.Rotate(new Vector3(Random.Range(10, 20), Random.Range(10, 20), Random.Range(10, 20)) * Time.deltaTime);
                 //transform.rotation = Quaternion.Euler(transform.eulerAngles + (new Vector3(20, 5, 0) * Time.deltaTime));
-            }
+            }*/
 
             if (Input.GetKeyDown(KeyCode.B))
             {

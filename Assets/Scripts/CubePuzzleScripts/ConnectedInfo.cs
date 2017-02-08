@@ -14,8 +14,11 @@ public class ConnectedInfo : MonoBehaviour {
     // Use this for initialization
     void Start () {
         manager = transform.root.GetComponent<PuzzleManager>();
-        incompleteRGBColor = manager.GetLaserPigment(laserFilter);
-        incompleteRGBColor *= 1 / 4f;
+        if(laserFilter != EmitterScript.LaserColor.None)
+        {
+            incompleteRGBColor = manager.GetLaserPigment(laserFilter);
+            incompleteRGBColor *= 1 / 3f;
+        }
 	}
 	
 	// Update is called once per frame
@@ -24,7 +27,7 @@ public class ConnectedInfo : MonoBehaviour {
         if (manager.editor)
         {
             incompleteRGBColor = manager.GetLaserPigment(laserFilter);
-            incompleteRGBColor *= 1 / 4f;
+            incompleteRGBColor *= 1 / 3f;
         }
 
         //If we've received a laser

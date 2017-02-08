@@ -85,15 +85,15 @@ public class EmitterScript : MonoBehaviour {
         {
             laserPigment = color;
             lr.material.color = laserPigment;
-            transform.FindChild("StandinModel").GetComponent<Renderer>().material.color = laserPigment;
         }
         else
         {
-            laserPigment = color/4;
+            laserPigment = color / 2f;
             lr.material.color = laserPigment;
-            transform.FindChild("StandinModel").GetComponent<Renderer>().material.color = laserPigment;
         }
-     
+        transform.FindChild("Emitter").GetChild(0).GetComponent<Renderer>().material.color = laserPigment;
+        //transform.FindChild("Emitter").GetChild(1).GetComponent<Renderer>().material.color = laserPigment;
+
     }
 
     //Call this method to start drawing.
@@ -171,7 +171,11 @@ public class EmitterScript : MonoBehaviour {
     {
         foreach (GameObject obj in connectedObjects)
         {
-            obj.GetComponent<ConnectedInfo>().received = false;
+            if(obj.transform.parent.name.Contains("Receiver") || obj.transform.parent.name.Contains("Point"))
+            {
+                obj.GetComponent<ConnectedInfo>().received = false;
+            }
+            obj.GetComponent<ConnectionNOde>().connected = false;
         }
         connectedObjects.Clear();
     }
@@ -188,20 +192,14 @@ public class EmitterScript : MonoBehaviour {
         //Only add it if it is a valid position.
         if (CheckViableNode(node))
         {
-            //If it is the type of component we need to keep track of, add it to the list.
-            if(node.transform.parent.tag == "Tracked")
-            {
-                if (node.transform.parent.name.Contains("Receiver"))
-                {
-                    EndDraw();
-                }
-                connectedObjects.Add(node.transform.parent.gameObject);
-            }
+            //Add the obejct to the list.
+            connectedObjects.Add(node);
 
             //Add a Vector. It doesn't matter what value it is since the top level of the list is always connectede to the controller.
             linePositions.Add(node);
             //Set the vector before as the target position.
             linePositions[linePositions.Count - 2] = node;
+            node.GetComponent<ConnectionNOde>().connected = true;
         }
     }
 
@@ -211,6 +209,11 @@ public class EmitterScript : MonoBehaviour {
     //Case 2: Node is not directly next to the previous node.
     public bool CheckViableNode(GameObject node)
     {
+        //Case -1: Already used by someone else
+        if(node.GetComponent<ConnectionNOde>().connected == true)
+        {
+            return false;
+        }
 
         //Case 0: Node has already been used.
         for (int i = 0; i < linePositions.Count; i++)

@@ -655,7 +655,7 @@ public class CubeSpawner : MonoBehaviour {
             }
         }
     }
-
+    #if UNITY_EDITOR
     //Save as editable cube.
     public void SaveAsEditableCube(Transform transform)
     {
@@ -712,12 +712,14 @@ public class CubeSpawner : MonoBehaviour {
         }
         spawnedPrefab.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
         spawnedPrefab.transform.FindChild("Glow").GetComponent<Light>().range *= 0.1f;
+        spawnedPrefab.transform.tag = "CubePuzzle";
         //Replace the prefab with the modified one. Destroy the one that exists in the scene.
         PrefabUtility.ReplacePrefab(spawnedPrefab, prefab);
         DestroyImmediate(spawnedPrefab);
         transform.name = original;
         
     }
+#endif
 
     //Apply rotations found in fixrotation all across the cube
     public void ApplyRotations()
@@ -933,7 +935,7 @@ public class PuzzleEditorDrawer: PropertyDrawer
             SerializedProperty faceBlocks;
             
             //Loop through array, always size five
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
             {
                 newRect.width = position.width;
                 switch (i)
@@ -1025,7 +1027,7 @@ public class PuzzleEditorDrawer: PropertyDrawer
             return 18f * 7f;
         }
         else{
-            return 18f * 32f;
+            return 18f * 38f;
         }
     }
 }
