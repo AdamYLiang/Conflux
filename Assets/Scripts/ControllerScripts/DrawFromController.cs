@@ -52,6 +52,7 @@ public class DrawFromController : MonoBehaviour {
         //Found a connection node.
         if(col.gameObject.name.Contains("ConnectionNode"))
         {
+            //If we are currently drawing
             if(emitter != null)
             {
                 //If we have already connected to this node before...
@@ -67,8 +68,8 @@ public class DrawFromController : MonoBehaviour {
                             emitter.GetComponent<EmitterScript>().linePositions.Remove(col.gameObject);
                         }   
                     }
-                }//New node, attempt to add it.
-                else
+                }//New node, attempt to add it, ONLY if it isn't already connected.
+                else if (!col.GetComponent<ConnectionNOde>().connected)
                 {
                     Vector3 position = col.transform.parent.position;
                     emitter.GetComponent<EmitterScript>().AddLineNode(col.gameObject);
