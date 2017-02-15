@@ -4,6 +4,8 @@ public class PickupScript : MonoBehaviour
 {
     private SteamVR_TrackedController _controller;
     private PrimitiveType _currentPrimitiveType = PrimitiveType.Sphere;
+    private GameObject pickupObject;
+    private bool holdingObject = false; 
 
     private void OnEnable()
     {
@@ -18,46 +20,52 @@ public class PickupScript : MonoBehaviour
         _controller.PadClicked -= HandlePadClicked;
     }
 
-    #region Primitive Spawning
     private void HandleTriggerClicked(object sender, ClickedEventArgs e)
     {
-        SpawnCurrentPrimitiveAtController();
-        Debug.Log("Firing from the Pickup Script as well");
+        Debug.Log("Attempting to pick up or drop");
+        if(pickupObject != null)
+        {
+            PickUpTheObject();
+        }
+
+        if (holdingObject)
+        {
+           // Debug.Log("dropping");
+            pickupObject.transform.parent = null;
+            pickupObject.GetComponent<Rigidbody>().useGravity = true;
+            pickupObject.GetComponent<Rigidbody>().isKinematic = false;
+            holdingObject = false;
+        }
+
     }
 
-    private void SpawnCurrentPrimitiveAtController()
+    public void PickUpTheObject()
     {
-        var spawnedPrimitive = GameObject.CreatePrimitive(_currentPrimitiveType);
-        spawnedPrimitive.transform.position = transform.position;
-        spawnedPrimitive.transform.rotation = transform.rotation;
+            //Debug.Log("picking up");
+            holdingObject = true;
+            pickupObject.transform.parent = this.transform;
+            pickupObject.GetComponent<Rigidbody>().useGravity = false;
+            pickupObject.GetComponent<Rigidbody>().isKinematic = true;
 
-        spawnedPrimitive.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-        if (_currentPrimitiveType == PrimitiveType.Plane)
-            spawnedPrimitive.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
     }
-    #endregion
 
-    #region Primitive Selection
+    public void OnTriggerEnter(Collider activator)
+    {
+        //Debug.Log(activator.name + " " + activator.tag);
+
+        if (activator.tag == "pickupable")
+        {
+            pickupObject = activator.gameObject;
+        }
+    }
+
+    public void OnTriggerExit(Collider activator)
+    {
+        pickupObject = null;
+    }
+
+ 
     private void HandlePadClicked(object sender, ClickedEventArgs e)
     {
-        if (e.padY < 0)
-            SelectPreviousPrimitive();
-        else
-            SelectNextPrimitive();
     }
-
-    private void SelectNextPrimitive()
-    {
-        _currentPrimitiveType++;
-        if (_currentPrimitiveType > PrimitiveType.Quad)
-            _currentPrimitiveType = PrimitiveType.Sphere;
-    }
-
-    private void SelectPreviousPrimitive()
-    {
-        _currentPrimitiveType--;
-        if (_currentPrimitiveType < PrimitiveType.Sphere)
-            _currentPrimitiveType = PrimitiveType.Quad;
-    }
-    #endregion
 }
