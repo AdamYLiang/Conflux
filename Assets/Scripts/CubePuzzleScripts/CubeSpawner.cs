@@ -298,7 +298,8 @@ public class CubeSpawner : MonoBehaviour {
                                 Vector3 position = CalculateRelativePosition((int)info.x);
 
                                 //Spawn the object and then use the proper modifications in the function.
-                                GameObject temp = Instantiate(Tiles[value], cube.transform.position + position, rotation);
+                                GameObject temp = Instantiate(Tiles[value], cube.transform.position + position, rotation, transform.FindChild("PlayTiles"));
+                                temp.GetComponent<TileUpdater>().cubeCoordinate = new Vector3(i, j, k);
                                 temp.transform.name = "(" + i + ", " + j + ", " + k + ") " + temp.transform.name;
                                 ModifyObject(temp, info, 0, rotation);
                             }
@@ -346,6 +347,7 @@ public class CubeSpawner : MonoBehaviour {
         temp.GetComponent<FixRotation>().face = (FixRotation.Face)info.x;
         temp.GetComponent<FixRotation>().rotationFix = rotationFix;
         temp.GetComponent<FixRotation>().SetOriginal(rotation.eulerAngles);
+       
         if (temp.name.Contains("Wall"))
         {
             temp.transform.GetChild(0).GetComponent<WallBlockRotation>().fixRotation = rotationFix;
@@ -417,7 +419,7 @@ public class CubeSpawner : MonoBehaviour {
     public Vector3 CalculateRelativePosition(int face)
     {
         //Switch statements for the face we are on
-        float space = 0.5f;
+        float space = 0.5f * transform.localScale.x;
         switch (face)
         {
             //North face

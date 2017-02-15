@@ -39,13 +39,17 @@ public class EmitterScript : MonoBehaviour {
         lr.GetComponent<LineRenderer>().startWidth *= puzzleScale;
         lr.GetComponent<LineRenderer>().endWidth *= puzzleScale;
 
+        /* Depreceated.
         //Find our coordinate by checking our name and converting it to a Vector3
         char[] letters = transform.name.ToCharArray();
         string x = "" + letters[1];
         string y = "" + letters[4];
         string z = "" + letters[7];
+
+
         //Debug.Log(x + ", " + y + ", " + z);
-        laserOriginCoordinate = new Vector3(int.Parse(x), int.Parse(y), int.Parse(z));
+        laserOriginCoordinate = new Vector3(int.Parse(x), int.Parse(y), int.Parse(z));*/
+        laserOriginCoordinate = GetComponent<TileUpdater>().cubeCoordinate;
         //Debug.Log(laserOriginCoordinate);
 
         //Initialize the emitter.
