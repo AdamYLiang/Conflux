@@ -299,7 +299,7 @@ public class CubeSpawner : MonoBehaviour {
 
                                 //Spawn the object and then use the proper modifications in the function.
                                 GameObject temp = Instantiate(Tiles[value], cube.transform.position + position, rotation, transform.FindChild("PlayTiles"));
-                               
+                                temp.GetComponent<TileUpdater>().cubeCoordinate = new Vector3(i, j, k);
                                 temp.transform.name = "(" + i + ", " + j + ", " + k + ") " + temp.transform.name;
                                 ModifyObject(temp, info, 0, rotation);
                             }
