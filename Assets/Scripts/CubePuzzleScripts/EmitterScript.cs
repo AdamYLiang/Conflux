@@ -39,13 +39,17 @@ public class EmitterScript : MonoBehaviour {
         lr.GetComponent<LineRenderer>().startWidth *= puzzleScale;
         lr.GetComponent<LineRenderer>().endWidth *= puzzleScale;
 
+        /* Depreceated.
         //Find our coordinate by checking our name and converting it to a Vector3
         char[] letters = transform.name.ToCharArray();
         string x = "" + letters[1];
         string y = "" + letters[4];
         string z = "" + letters[7];
+
+
         //Debug.Log(x + ", " + y + ", " + z);
-        laserOriginCoordinate = new Vector3(int.Parse(x), int.Parse(y), int.Parse(z));
+        laserOriginCoordinate = new Vector3(int.Parse(x), int.Parse(y), int.Parse(z));*/
+        laserOriginCoordinate = GetComponent<TileUpdater>().cubeCoordinate;
         //Debug.Log(laserOriginCoordinate);
 
         //Initialize the emitter.
@@ -175,7 +179,7 @@ public class EmitterScript : MonoBehaviour {
             {
                 obj.GetComponent<ConnectedInfo>().received = false;
             }
-            obj.GetComponent<ConnectionNOde>().connected = false;
+            setConnection(obj, false);
         }
         connectedObjects.Clear();
     }
@@ -199,8 +203,38 @@ public class EmitterScript : MonoBehaviour {
             linePositions.Add(node);
             //Set the vector before as the target position.
             linePositions[linePositions.Count - 2] = node;
-            node.GetComponent<ConnectionNOde>().connected = true;
+            setConnection(node, true);
         }
+    }
+
+    //Set the connection node to bool
+    public void setConnection(GameObject obj, bool connection)
+    {
+        if (obj.GetComponent<ConnectionNOde>() != null)
+        {
+            obj.GetComponent<ConnectionNOde>().connected = connection;
+        }
+        else
+        {
+            obj.transform.parent.GetComponent<ConnectionNOde>().connected = connection;
+        }
+    }
+
+    //Check if connection node is connected
+    public bool isConnected(GameObject obj)
+    {
+        if (obj.GetComponent<ConnectionNOde>() != null)
+        {
+            if (obj.GetComponent<ConnectionNOde>().connected)
+            {
+                return true;
+            }
+        }
+        else if (obj.transform.parent.GetComponent<ConnectionNOde>().connected)
+        {
+            return true;
+        }
+        return false;
     }
 
     //Check if the position is invalid.
@@ -210,10 +244,18 @@ public class EmitterScript : MonoBehaviour {
     public bool CheckViableNode(GameObject node)
     {
         //Case -1: Already used by someone else
-        if(node.GetComponent<ConnectionNOde>().connected == true)
+        if (node.GetComponent<ConnectionNOde>() != null)
+        {
+            if (node.GetComponent<ConnectionNOde>().connected)
+            {
+                return false;
+            }
+        }
+        else if (node.transform.parent.GetComponent<ConnectionNOde>().connected)
         {
             return false;
         }
+
 
         //Case 0: Node has already been used.
         for (int i = 0; i < linePositions.Count; i++)
