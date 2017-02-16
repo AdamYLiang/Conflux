@@ -18,7 +18,11 @@ public class ConnectedInfo : MonoBehaviour {
         {
             incompleteRGBColor = manager.GetLaserPigment(laserFilter);
             incompleteRGBColor *= 1 / 3f;
+            receivedRGBColor = manager.GetLaserPigment(laserFilter);
         }
+
+       
+
 	}
 	
 	// Update is called once per frame
@@ -27,6 +31,7 @@ public class ConnectedInfo : MonoBehaviour {
         if (manager.editor)
         {
             incompleteRGBColor = manager.GetLaserPigment(laserFilter);
+            receivedRGBColor = manager.GetLaserPigment(laserFilter);
             incompleteRGBColor *= 1 / 3f;
         }
 

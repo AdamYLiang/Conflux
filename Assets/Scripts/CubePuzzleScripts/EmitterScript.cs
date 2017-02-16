@@ -92,7 +92,7 @@ public class EmitterScript : MonoBehaviour {
         }
         else
         {
-            laserPigment = color / 2f;
+            laserPigment = color / 3f;
             lr.material.color = laserPigment;
         }
         transform.FindChild("Emitter").GetChild(0).GetComponent<Renderer>().material.color = laserPigment;
