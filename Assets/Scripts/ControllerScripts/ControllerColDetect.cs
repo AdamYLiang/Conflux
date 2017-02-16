@@ -17,9 +17,5 @@ public class ControllerColDetect : MonoBehaviour
             transform.parent.GetComponent<RotationController>().currentPuzzle = activator.transform.root.gameObject;
         }
 
-        if (activator.tag.Contains("Face"))
-        {
-            transform.parent.GetComponent<RotationController>().facePosition = activator.transform.position;
-        }
     }
 }
