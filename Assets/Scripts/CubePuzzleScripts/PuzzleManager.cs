@@ -97,7 +97,7 @@ public class PuzzleManager : MonoBehaviour {
                 randomRotation.x = Mathf.Clamp(randomRotation.x + Random.Range(-10f, 10f), -20, 20f);
                 randomRotation.y = Mathf.Clamp(randomRotation.y + Random.Range(-10f, 10f), -20, 20f);
                 randomRotation.z = Mathf.Clamp(randomRotation.z + Random.Range(-10f, 10f), -20, 20f);
-//transform.Rotate(randomRotation * Time.deltaTime);
+                transform.Rotate(randomRotation * Time.deltaTime);
             }
             /*
 
@@ -231,6 +231,7 @@ public class PuzzleManager : MonoBehaviour {
     {
         receiverCompletion = new List<bool>();
     }
+
 
 
 }
