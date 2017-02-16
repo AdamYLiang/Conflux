@@ -78,39 +78,36 @@ public class RotationController : MonoBehaviour {
     void doRotation(Vector3 directionValue)
     {
         //Clamps the value to 1f if it exceeds it, in order to simulate Input.GetAxis, needs to account for -1 as well ??
-        if(directionValue.x > 1f)
-        {
-            rotX = 1f * 3f * Mathf.Deg2Rad;
-        }
-        else rotX = directionValue.x * 3f * Mathf.Deg2Rad;
+        //if(directionValue.x > 1f)
+        //{
+        //    rotX = 1f * 3f * Mathf.Deg2Rad;
+        //}
+        //else rotX = directionValue.x * 3f * Mathf.Deg2Rad;
 
-        if (directionValue.y > 1f)
-        {
-            rotY = 1f * 3f * Mathf.Deg2Rad;
-        }
-        else rotY = directionValue.y * 3f * Mathf.Deg2Rad;
+        //if (directionValue.y > 1f)
+        //{
+        //    rotY = 1f * 3f * Mathf.Deg2Rad;
+        //}
+        //else rotY = directionValue.y * 3f * Mathf.Deg2Rad;
 
-        if (directionValue.z > 1f)
-        {
-            rotZ = 1f * 3f * Mathf.Deg2Rad;
-        }
-        else rotZ = directionValue.z * 3f * Mathf.Deg2Rad;
-
-        //rotX = directionValue.x * 3f * Mathf.Deg2Rad;
-        //rotY = directionValue.y * 3f * Mathf.Deg2Rad;
-        //rotZ = directionValue.z * 3f * Mathf.Deg2Rad;
+        //if (directionValue.z > 1f)
+        //{
+        //    rotZ = 1f * 3f * Mathf.Deg2Rad;
+        //}
+        //else rotZ = directionValue.z * 3f * Mathf.Deg2Rad;
+        Debug.Log(rotX);
+        rotX = directionValue.z * 30f * Mathf.Deg2Rad;
+        rotY = directionValue.y * 30f * Mathf.Deg2Rad;
+        rotZ = directionValue.x * 30f * Mathf.Deg2Rad;
 
         //currentPuzzle.transform.RotateAround(currentPuzzle.transform.position, Vector3.right, -rotY * Time.deltaTime);
 
         //currentPuzzle.transform.RotateAround()
 
         //Takes the cube and rotates it along the WORLDSPACE axis based on the degree calculated above
-        //Interesting note is that the 45 degree angles pull correctly.
-        //However, left/right makes the cube rotate up/down and vice versa
-        //Tried flipping values but alas, keep trying tomorrow
-        currentPuzzle.transform.RotateAround(Vector3.right, -rotY);
-        currentPuzzle.transform.RotateAround(Vector3.up, -rotX);
-        currentPuzzle.transform.RotateAround(Vector3.forward, rotZ);
+        currentPuzzle.transform.RotateAround(Vector3.right, rotX);
+        //currentPuzzle.transform.RotateAround(Vector3.forward, rotY);
+        currentPuzzle.transform.RotateAround(Vector3.forward, -rotZ);
 
     }
 

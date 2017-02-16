@@ -88,7 +88,8 @@ public class StartButton : MonoBehaviour {
     //On enter
     void OnTriggerEnter(Collider col)
     {
-        if (col.transform.name == "Camera (head)")
+        Debug.Log(col.name);
+        if (col.transform.root.transform.name == "[CameraRig]")
         {
             entered = true;
         }
@@ -97,7 +98,7 @@ public class StartButton : MonoBehaviour {
     //On exit
     void OnTriggerExit(Collider col)
     {
-        if (col.transform.name == "Camera (head)")
+        if (col.transform.root.transform.name == "[CameraRig]")
         {
             entered = false;
         }

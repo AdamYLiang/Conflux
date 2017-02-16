@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class TileUpdater : MonoBehaviour {
 
+    //Reference to manager
+    public PuzzleManager puzzleManager;
+
     //A reference to the main puzzle editor
     public CubeSpawner puzzleEditor;
 
@@ -24,20 +27,27 @@ public class TileUpdater : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        puzzleEditor = transform.root.GetComponent<CubeSpawner>();
-        tiles = puzzleEditor.Tiles;
-        originalTileType = tiles[tileType];
+        puzzleManager = transform.root.GetComponent<PuzzleManager>();
+        if (puzzleManager.editor)
+        {
+            puzzleEditor = transform.root.GetComponent<CubeSpawner>();
+            tiles = puzzleEditor.Tiles;
+            originalTileType = tiles[tileType];
+        }
+       
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		
-        //If we have changed the tile type
-        if(tiles[tileType] != originalTileType)
+        if(puzzleManager.editor)
         {
-            Replace();
+            //If we have changed the tile type
+            if (tiles[tileType] != originalTileType)
+            {
+                Replace();
+            }
         }
-
 	}
 
     //Replace ourselves with the correct tile type.
