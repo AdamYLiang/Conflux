@@ -38,7 +38,7 @@ public class DrawFromController : MonoBehaviour {
                 //Press a key and set our new draw origin to here.
                 if (mainController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) && col.gameObject.transform.root.GetComponent<PuzzleManager>().play)
                 {
-                    transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+                    transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
                     emitter = col.gameObject.transform.parent.gameObject;
                     emitter.GetComponent<EmitterScript>().StartDraw(gameObject);
                 }
@@ -69,11 +69,23 @@ public class DrawFromController : MonoBehaviour {
                         }   
                     }
                 }//New node, attempt to add it, ONLY if it isn't already connected.
-                else if (!col.GetComponent<ConnectionNOde>().connected)
+                else if (col.GetComponent<ConnectionNOde>() != null)
                 {
-                    Vector3 position = col.transform.parent.position;
-                    emitter.GetComponent<EmitterScript>().AddLineNode(col.gameObject);
-
+                    if (!col.GetComponent<ConnectionNOde>().connected)
+                    {
+                        Vector3 position = col.transform.parent.position;
+                        emitter.GetComponent<EmitterScript>().AddLineNode(col.gameObject);
+                    }
+                }
+                else if (col.transform.parent.name.Contains("Receiver"))
+                {
+                    if (!col.transform.parent.GetComponent<ConnectionNOde>().connected)
+                    {
+                        Vector3 position = col.transform.parent.position;
+                        emitter.GetComponent<EmitterScript>().AddLineNode(col.gameObject);
+                        Debug.Log("Receiver isn't connected");
+                    }
+                    
                 }
 
             }
