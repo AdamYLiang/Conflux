@@ -200,8 +200,10 @@ public class EmitterScript : MonoBehaviour {
         setConnection(node, false);
     }
 
+    //Changed to boolean for haptics: Adam Liang
+    //Returns true if it connects, in order to help if it should pulse
     //Add a position to the line
-    public void AddLineNode(GameObject node)
+    public bool AddLineNode(GameObject node)
     {
         //Only add it if it is a valid position.
         if (CheckViableNode(node))
@@ -214,7 +216,9 @@ public class EmitterScript : MonoBehaviour {
             //Set the vector before as the target position.
             linePositions[linePositions.Count - 2] = node;
             setConnection(node, true);
+            return true;
         }
+        else return false;
     }
 
     //Set the connection node to bool

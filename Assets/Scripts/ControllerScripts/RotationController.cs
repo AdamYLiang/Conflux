@@ -34,6 +34,10 @@ public class RotationController : MonoBehaviour {
     float steadyRotateZ;
     float steadyRotateY;
 
+    //Haptics values
+    public float powerOfRumble = 0.3f; //Between 0 and 1
+    public float durationOfRumble = 0.3f; //In terms of seconds
+
     //Some lock code : Calvin So
     protected bool lockRotation = false;
 
@@ -55,6 +59,9 @@ public class RotationController : MonoBehaviour {
         //If you press the button
         if (controller.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
         {
+
+            //StartCoroutine(RumbleController(durationOfRumble, powerOfRumble));
+
             //And you are touching a button, set it to play and deactivate the box collider
             if (isTouchingPuzzle)
             {
@@ -66,7 +73,7 @@ public class RotationController : MonoBehaviour {
                 shouldRotate = true;
             }
             //Debug.Log("Trigger Pressed");
-            controller.TriggerHapticPulse(700);
+
         }
 
         //If button is released
@@ -199,4 +206,18 @@ public class RotationController : MonoBehaviour {
         temp.transform.RotateAround(Vector3.forward, -steadyRotX);
     }
 
+    //Coroutine to rumble controller, takes the power and the duration and then lerps it while changing the pulse 
+    IEnumerator RumbleController(float duration, float power)
+    {
+        power = Mathf.Clamp01(power);
+        float start = Time.realtimeSinceStartup;
+        
+        while(Time.realtimeSinceStartup - start <= duration)
+        {
+            int updatedPower = Mathf.RoundToInt(Mathf.Lerp(0, 3999, power));
+            controller.TriggerHapticPulse((ushort)updatedPower);
+            yield return null;
+        }
+    }
 }
+
