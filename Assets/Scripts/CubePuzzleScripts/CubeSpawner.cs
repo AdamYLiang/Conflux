@@ -657,6 +657,85 @@ public class CubeSpawner : MonoBehaviour {
             }
         }
     }
+
+    //Gets all children with the name STRING from origin
+    public Transform[] GetAllChildren(Transform origin, string target)
+    {
+        List<Transform> childList = new List<Transform>();
+        for(int i = 0; i < origin.childCount; i++)
+        {
+            if (origin.GetChild(i).name.Contains(target))
+            {
+                childList.Add(origin.GetChild(i));
+            }
+        }
+
+        return childList.ToArray();
+
+    }
+
+    //Swaps two cards in a list index a and index b.
+    public void SwapCards(List<EmitterScript.LaserColor> list, int a, int b)
+    {
+        EmitterScript.LaserColor temp = list[a];
+        list[a] = list[b];
+        list[b] = temp;
+    }
+
+    //Swaps two cards in a list index a and index b.
+    public void SwapCards(List<GameObject> list, int a, int b)
+    {
+        GameObject temp = list[a];
+        list[a] = list[b];
+        list[b] = temp;
+    }
+
+    //Randomly assigns colors for emitters and receivers.
+    //NOTE: This WILL crash if there are too many emitters/receivers in comparison to the number of colors available.
+    public void RandomlyAssignAllColors()
+    {
+        Transform playTiles = transform.FindChild("PlayTiles");
+        Transform[] allReceivers = GetAllChildren(playTiles, "Receiver");
+        Transform[] allEmitters = GetAllChildren(playTiles, "Emitter");
+
+        //Create a deck of colors for both emitters and receivers.
+        List<EmitterScript.LaserColor> deck1 = new List<EmitterScript.LaserColor>();
+        List<GameObject> deckEmitters = new List<GameObject>();
+
+        //Add all the valid colors. (no NONE color, which is ENUM 11)
+        for(int i = 0; i < 11; i++)
+        {
+            deck1.Add((EmitterScript.LaserColor)i);
+        }
+
+        for(int i = 0; i < allEmitters.Length; i++)
+        {
+            deckEmitters.Add(allEmitters[i].gameObject);
+        }
+
+        //Shuffle both decks. 
+        //This strategy will randomly swap cards N times.
+        for(int i = 0; i < 20; i++)
+        {
+            //Pick two random colors and switch them
+            int indexA = Random.Range(0, 11);
+            int indexB = Random.Range(0, 11);
+            SwapCards(deck1, indexA, indexB);
+
+            //Pick two random colors and switch them
+            indexA = Random.Range(0, deckEmitters.Count);
+            indexB = Random.Range(0, deckEmitters.Count);
+            SwapCards(deckEmitters, indexA, indexB);
+        }
+
+        //Just take each "card" in succession.
+        for (int i = 0; i < allReceivers.Length; i++)
+        {
+            allReceivers[i].GetComponent<ConnectedInfo>().laserFilter = deck1[i];
+            deckEmitters[i].GetComponent<EmitterScript>().laserColor = allReceivers[i].GetComponent<ConnectedInfo>().laserFilter;
+        }
+    }
+
     #if UNITY_EDITOR
     //Save as editable cube.
     public void SaveAsEditableCube(Transform transform)
@@ -707,6 +786,7 @@ public class CubeSpawner : MonoBehaviour {
             emitters[i].linePositions.Clear();
         }
         spawnedPrefab.GetComponent<PuzzleManager>().receiverCompletion.Clear();
+        spawnedPrefab.GetComponent<PuzzleManager>().editor = false;
         FixRotation[] rotationFixers = spawnedPrefab.transform.GetComponentsInChildren<FixRotation>();
         for(int i = 0; i < rotationFixers.Length; i++)
         {
@@ -829,6 +909,11 @@ public class CubeSpawnerEditor : Editor
         if (GUILayout.Button("Delete Components Selected Face"))
         {
             script.RemoveTilesOnFace(script.puzzleEditor.selectedFace);
+        }
+
+        if (GUILayout.Button("Randomly assign all colors"))
+        {
+            script.RandomlyAssignAllColors();
         }
 
         if (GUILayout.Button("Save Puzzle"))

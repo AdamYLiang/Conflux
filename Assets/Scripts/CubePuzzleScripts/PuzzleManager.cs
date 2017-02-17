@@ -94,9 +94,9 @@ public class PuzzleManager : MonoBehaviour {
             }
             else if(!play && !editor)
             {
-                randomRotation.x = Mathf.Clamp(randomRotation.x + Random.Range(-10f, 10f), -20, 20f);
-                randomRotation.y = Mathf.Clamp(randomRotation.y + Random.Range(-10f, 10f), -20, 20f);
-                randomRotation.z = Mathf.Clamp(randomRotation.z + Random.Range(-10f, 10f), -20, 20f);
+                randomRotation.x = Mathf.Clamp(randomRotation.x + Random.Range(0, 10f), -20, 20f);
+                randomRotation.y = Mathf.Clamp(randomRotation.y + Random.Range(0, 10f), -20, 20f);
+                randomRotation.z = Mathf.Clamp(randomRotation.z + Random.Range(0, 10f), -20, 20f);
                 transform.Rotate(randomRotation * Time.deltaTime);
             }
             /*
@@ -114,6 +114,26 @@ public class PuzzleManager : MonoBehaviour {
         }
 	}
 
+    public IEnumerator HidePuzzle()
+    {
+        float timer = 0f;
+        GetComponent<AudioSource>().Play();
+        while (!hidden)
+        {
+            timer += Time.deltaTime;
+            //Debug.Log(timer);
+            if(timer >= 3f)
+            {
+                hidden = true;
+            }
+            else
+            {
+                yield return new WaitForSeconds(Time.deltaTime);
+            }
+        }
+       
+    }
+
     //Hides the cube so that performance can be increased.
     public void HideCube()
     {
@@ -124,6 +144,7 @@ public class PuzzleManager : MonoBehaviour {
                 transform.GetChild(i).transform.gameObject.SetActive(false);
             }
         }
+        GetComponent<Collider>().enabled = false;
         allActive = false;
       
     }
@@ -138,7 +159,9 @@ public class PuzzleManager : MonoBehaviour {
                 transform.GetChild(i).transform.gameObject.SetActive(true);
             }
         }
+        GetComponent<Collider>().enabled = true;
         allActive = true;
+
     
     }
 

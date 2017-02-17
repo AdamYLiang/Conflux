@@ -55,7 +55,7 @@ public class EmitterScript : MonoBehaviour {
         //Initialize the emitter.
       
         puzzleScale = transform.root.lossyScale.x;
-        SetLaserPigment(manager.GetLaserPigment(laserColor)/4);
+        SetLaserPigment(manager.GetLaserPigment(laserColor)/3);
     
 	}
 	
@@ -92,7 +92,7 @@ public class EmitterScript : MonoBehaviour {
         }
         else
         {
-            laserPigment = color / 2f;
+            laserPigment = color / 3f;
             lr.material.color = laserPigment;
         }
         transform.FindChild("Emitter").GetChild(0).GetComponent<Renderer>().material.color = laserPigment;
@@ -177,7 +177,7 @@ public class EmitterScript : MonoBehaviour {
         {
             if(obj.transform.parent.name.Contains("Receiver") || obj.transform.parent.name.Contains("Point"))
             {
-                obj.GetComponent<ConnectedInfo>().received = false;
+                obj.transform.parent.GetComponent<ConnectedInfo>().received = false;
             }
             setConnection(obj, false);
         }
@@ -190,8 +190,20 @@ public class EmitterScript : MonoBehaviour {
         linePositions[linePositions.Count - 1] = simulatedController;
     }
 
+    //Remove a node
+    public void RemoveLineNode(GameObject node)
+    {
+        connectedObjects.Remove(node);
+
+        linePositions.Remove(node);
+
+        setConnection(node, false);
+    }
+
+    //Changed to boolean for haptics: Adam Liang
+    //Returns true if it connects, in order to help if it should pulse
     //Add a position to the line
-    public void AddLineNode(GameObject node)
+    public bool AddLineNode(GameObject node)
     {
         //Only add it if it is a valid position.
         if (CheckViableNode(node))
@@ -204,7 +216,9 @@ public class EmitterScript : MonoBehaviour {
             //Set the vector before as the target position.
             linePositions[linePositions.Count - 2] = node;
             setConnection(node, true);
+            return true;
         }
+        else return false;
     }
 
     //Set the connection node to bool
@@ -251,10 +265,14 @@ public class EmitterScript : MonoBehaviour {
                 return false;
             }
         }
-        else if (node.transform.parent.GetComponent<ConnectionNOde>().connected)
+        else if(node.transform.parent.GetComponent<ConnectionNOde>() != null)
         {
-            return false;
+            if (node.transform.parent.GetComponent<ConnectionNOde>().connected)
+            {
+                return false;
+            }
         }
+        
 
 
         //Case 0: Node has already been used.
@@ -297,7 +315,7 @@ public class EmitterScript : MonoBehaviour {
             {
                 return true;
             }
-           Debug.Log(distance + " " + difference);
+           //Debug.Log(distance + " " + difference);
            return false;
         }
         return true;
