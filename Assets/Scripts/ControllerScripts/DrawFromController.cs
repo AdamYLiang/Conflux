@@ -18,7 +18,7 @@ public class DrawFromController : MonoBehaviour {
         mainController = SteamVR_Controller.Input((int)trackedObj.index);
         if (mainController.GetPressUp(SteamVR_Controller.ButtonMask.Trigger))
         {
-            transform.localScale = new Vector3(0.17f, 0.17f, 0.17f);
+            transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
             if (emitter != null)
             {
                 emitter.GetComponent<EmitterScript>().EndDraw();
@@ -38,7 +38,7 @@ public class DrawFromController : MonoBehaviour {
                 //Press a key and set our new draw origin to here.
                 if (mainController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) && col.gameObject.transform.root.GetComponent<PuzzleManager>().play)
                 {
-                    transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+                    transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
                     emitter = col.gameObject.transform.parent.gameObject;
                     emitter.GetComponent<EmitterScript>().StartDraw(gameObject);
                 }
@@ -65,7 +65,7 @@ public class DrawFromController : MonoBehaviour {
                         if(emitter.GetComponent<EmitterScript>().linePositions.IndexOf(col.gameObject) != 0)
                         {
                             //Remove it from the list.
-                            emitter.GetComponent<EmitterScript>().linePositions.Remove(col.gameObject);
+                            emitter.GetComponent<EmitterScript>().RemoveLineNode(col.gameObject);
                         }   
                     }
                 }//New node, attempt to add it, ONLY if it isn't already connected.
@@ -76,6 +76,11 @@ public class DrawFromController : MonoBehaviour {
                         Vector3 position = col.transform.parent.position;
                         emitter.GetComponent<EmitterScript>().AddLineNode(col.gameObject);
                     }
+                }//New node and edge connection
+                else if (col.transform.parent.name == "EdgeConnections")
+                {
+                    Vector3 position = col.transform.position;
+                    emitter.GetComponent<EmitterScript>().AddLineNode(col.gameObject);
                 }
                 else if (col.transform.parent.name.Contains("Receiver"))
                 {
@@ -83,7 +88,16 @@ public class DrawFromController : MonoBehaviour {
                     {
                         Vector3 position = col.transform.parent.position;
                         emitter.GetComponent<EmitterScript>().AddLineNode(col.gameObject);
-                        Debug.Log("Receiver isn't connected");
+                        Debug.Log("Receiver isn't connected... Let's connect it to our emitter.");
+
+                        ConnectedInfo info = col.transform.parent.GetComponent<ConnectedInfo>();
+                        info.receivedLaserColor = emitter.GetComponent<EmitterScript>().laserColor;
+                        info.received = true;
+                        emitter.GetComponent<EmitterScript>().connected = true;
+
+                        //Disconnect us from this emitter after connecting.
+                        emitter.GetComponent<EmitterScript>().EndDraw();
+                        emitter = null;
                     }
                     
                 }

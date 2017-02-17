@@ -24,13 +24,18 @@ public class RotationController : MonoBehaviour {
     public float percentage; //Percent to decay for timer
 
     //Rotation values before rotate
-    private float tempRotX, tempRotZ;
+    private float tempRotX, tempRotY, tempRotZ;
     float rotX;
     float rotZ;
+    float rotY;
 
     //Storage of rotation values to keep after a flick rotation
     float steadyRotateX;
     float steadyRotateZ;
+    float steadyRotateY;
+
+    //Some lock code : Calvin So
+    protected bool lockRotation = false;
 
     void Start () {
         isTouchingPuzzle = false;
@@ -39,6 +44,7 @@ public class RotationController : MonoBehaviour {
         continueRotate = false;
         rotationSpeed = 10;
         steadyRotateX = 0;
+        steadyRotateY = 0;
         steadyRotateZ = 0;
     }
 
@@ -72,6 +78,7 @@ public class RotationController : MonoBehaviour {
                 lastPuzzle = currentPuzzle;
                 percentage = 1f;
                 tempRotX = rotX;
+                tempRotY = rotY;
                 tempRotZ = rotZ;
                 currentPuzzle.transform.gameObject.GetComponent<BoxCollider>().enabled = true;
                 isTouchingPuzzle = false;
@@ -82,8 +89,18 @@ public class RotationController : MonoBehaviour {
             }
         }
 
+        if (controller.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
+        {
+            lockRotation = true;
+        }
+
+        if (controller.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad))
+        {
+            lockRotation = false;
+        }
+
         //If the player is grabbing a puzzle they can rotate it based on controller movement
-        if (shouldRotate)
+        if (shouldRotate && !lockRotation)
         {
             updatedPosition = transform.position;
             Vector3 directionToUpdate = (updatedPosition - rotationStartPosition);
@@ -100,10 +117,11 @@ public class RotationController : MonoBehaviour {
         if (continueRotate && !shouldRotate)
         {
             rotX = tempRotX * percentage;
+            rotY = tempRotY * percentage;
             rotZ = tempRotZ * percentage;
             percentage = Mathf.Clamp01(percentage - Time.deltaTime / rotDecayTime);
             
-            ContinueRotate(lastPuzzle, rotX, rotZ);
+            ContinueRotate(lastPuzzle, rotX, rotY, rotZ);
         }
 
     }
@@ -115,21 +133,29 @@ public class RotationController : MonoBehaviour {
         //Sets a deadzone between -0.1 and 0.1
         //Sets optimal rotate between -0.6 and 0.6
         //Anything more breaks the cube and makes it spin
+        /*
         if (directionValue.z <= 0.1 && directionValue.z >= -0.1)
         {
             rotationSpeed = 15;
             directionValue.z = 0;
         }
 
+        //Some ad-hoc code by Calvin.
+        //if (directionValue.y <= 0.1 && directionValue.y >= -0.1)
+        //{
+        //    rotationSpeed = 15;
+        //    directionValue.y = 0;
+        //}
+
         if (directionValue.x <= 0.1 && directionValue.x >= -0.1)
         {
             rotationSpeed = 15;
             directionValue.x = 0;
-        }
+        }*/
 
         //Actual rotation, does not take into account the y axis since two axis rotation seems good
         rotZ = directionValue.z * rotationSpeed * Mathf.Deg2Rad;
-        //rotY = directionValue.y * 30f * Mathf.Deg2Rad;
+        //rotY = directionValue.y * rotationSpeed * Mathf.Deg2Rad;
         rotX = directionValue.x * rotationSpeed * Mathf.Deg2Rad;
 
         //If the players flicks hard, save the value and continue rotating the cube once released 
@@ -140,6 +166,12 @@ public class RotationController : MonoBehaviour {
         if(directionValue.x > 0.4f || directionValue.x < -0.4f)
         {
             steadyRotateX = rotX;
+            continueRotate = true;
+        }
+
+        if(directionValue.y > 0.4f || directionValue.y < -0.4f)
+        {
+            steadyRotateY = rotY;
             continueRotate = true;
         }
 
@@ -157,12 +189,13 @@ public class RotationController : MonoBehaviour {
     }
 
     //Helper method that keeps the puzzle rotate after flick
-    void ContinueRotate(GameObject puzzle, float steadyRotX, float steadyRotZ)
-    {
+    void ContinueRotate(GameObject puzzle, float steadyRotX, float steadyRotY, float steadyRotZ)
+    {   
         GameObject temp = puzzle;
-        Debug.Log(steadyRotZ + " HERES MORE " + -steadyRotX);
+        //Debug.Log(steadyRotZ + " HERES MORE " + -steadyRotX);
         //This is used to decay the values so the rotation stops
         temp.transform.RotateAround(Vector3.right, steadyRotZ);
+        //temp.transform.RotateAround(Vector3.forward, steadyRotY);
         temp.transform.RotateAround(Vector3.forward, -steadyRotX);
     }
 
