@@ -8,6 +8,12 @@ public class DrawFromController : MonoBehaviour {
     public SteamVR_Controller.Device mainController;
     public SteamVR_TrackedObject trackedObj;
 
+    //Haptics values
+    public float powerOfRumble = 0.2f; //Between 0 and 1
+    public float durationOfRumble = 0.2f; //In terms of seconds
+    public float durationOfFinishRumble = 1.5f; //Used when finished connection to receiver 
+    public float powerOfFinishRumble = 0.9f; //Used when finished onnection to receiver 
+
     // Use this for initialization
     void Start () {
         trackedObj = transform.parent.GetComponent<SteamVR_TrackedObject>();
@@ -38,6 +44,9 @@ public class DrawFromController : MonoBehaviour {
                 //Press a key and set our new draw origin to here.
                 if (mainController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) && col.gameObject.transform.root.GetComponent<PuzzleManager>().play)
                 {
+                    //Rumble
+                    StartCoroutine(RumbleController(durationOfRumble, powerOfRumble));
+
                     transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
                     emitter = col.gameObject.transform.parent.gameObject;
                     emitter.GetComponent<EmitterScript>().StartDraw(gameObject);
@@ -74,13 +83,25 @@ public class DrawFromController : MonoBehaviour {
                     if (!col.GetComponent<ConnectionNOde>().connected)
                     {
                         Vector3 position = col.transform.parent.position;
-                        emitter.GetComponent<EmitterScript>().AddLineNode(col.gameObject);
+                        bool shouldEPulse = emitter.GetComponent<EmitterScript>().AddLineNode(col.gameObject);
+                        //Debug.Log("pulse + " + shouldEPulse);
+                        if (shouldEPulse)
+                        {
+                            //Rumble on connects
+                             StartCoroutine(RumbleController(durationOfRumble, powerOfRumble));
+                        }
                     }
                 }//New node and edge connection
                 else if (col.transform.parent.name == "EdgeConnections")
                 {
                     Vector3 position = col.transform.position;
-                    emitter.GetComponent<EmitterScript>().AddLineNode(col.gameObject);
+                    bool shouldPulse = emitter.GetComponent<EmitterScript>().AddLineNode(col.gameObject);
+                    //Debug.Log("pulse + " + shouldPulse);
+                    if (shouldPulse)
+                    {
+                        //Rumble on connects
+                        StartCoroutine(RumbleController(durationOfRumble, powerOfRumble));
+                    }
                 }
                 else if (col.transform.parent.name.Contains("Receiver"))
                 {
@@ -95,6 +116,9 @@ public class DrawFromController : MonoBehaviour {
                         info.received = true;
                         emitter.GetComponent<EmitterScript>().connected = true;
 
+                        //Rumble it
+                        StartCoroutine(RumbleController(durationOfFinishRumble, powerOfFinishRumble));
+
                         //Disconnect us from this emitter after connecting.
                         emitter.GetComponent<EmitterScript>().EndDraw();
                         emitter = null;
@@ -105,5 +129,19 @@ public class DrawFromController : MonoBehaviour {
             }
         }
 
+    }
+
+    //Coroutine to rumble controller, takes the power and the duration and then lerps it while changing the pulse 
+    public IEnumerator RumbleController(float duration, float power)
+    {
+        power = Mathf.Clamp01(power);
+        float start = Time.realtimeSinceStartup;
+
+        while (Time.realtimeSinceStartup - start <= duration)
+        {
+            int updatedPower = Mathf.RoundToInt(Mathf.Lerp(0, 3999, power));
+            mainController.TriggerHapticPulse((ushort)updatedPower);
+            yield return null;
+        }
     }
 }
