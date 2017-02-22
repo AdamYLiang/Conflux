@@ -31,26 +31,18 @@ public class EmitterScript : MonoBehaviour {
     private float heightFactor = 0.33f, puzzleScale = 1.0f;
     private PuzzleManager manager;
 
-	// Use this for initialization
-	void Start () {
+    //The particle system
+    public GameObject pSystem;
+
+    // Use this for initialization
+    void Start () {
         manager = transform.root.GetComponent<PuzzleManager>();
         puzzleScale = transform.root.lossyScale.x;
         lr = transform.FindChild("LaserRenderer").GetComponent<LineRenderer>();
         lr.GetComponent<LineRenderer>().startWidth *= puzzleScale;
         lr.GetComponent<LineRenderer>().endWidth *= puzzleScale;
 
-        /* Depreceated.
-        //Find our coordinate by checking our name and converting it to a Vector3
-        char[] letters = transform.name.ToCharArray();
-        string x = "" + letters[1];
-        string y = "" + letters[4];
-        string z = "" + letters[7];
-
-
-        //Debug.Log(x + ", " + y + ", " + z);
-        laserOriginCoordinate = new Vector3(int.Parse(x), int.Parse(y), int.Parse(z));*/
         laserOriginCoordinate = GetComponent<TileUpdater>().cubeCoordinate;
-        //Debug.Log(laserOriginCoordinate);
 
         //Initialize the emitter.
       
