@@ -30,6 +30,16 @@ public class NodeFeedback : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+        if(controller1 == null)
+        {
+            controller1 = GameObject.Find("Controller (left)");
+        }
+
+        if(controller2 == null)
+        {
+            controller2 = GameObject.Find("Controller (right)");
+        }
+
         if(controller1 != null && controller2 != null)
         {
             //Calculate the distance from controller to node
@@ -47,6 +57,11 @@ public class NodeFeedback : MonoBehaviour {
                 chosen = distance;
             }
 
+            if (chosen < detectRange)
+            {
+                //Debug.Log(chosen);
+            }
+
             //Default 1 will keep it the normal size. We want hte min to be 1, and the max to be maxSize.
             //We want it to scale bigger the closer it gets to 0. Our max range of default scaling should be detectRange
             float scaling = 1;
@@ -56,12 +71,8 @@ public class NodeFeedback : MonoBehaviour {
                 //DetectRange - chosen will be greater the smaller chosen is, i.e. closer to the node
                 //Thus, with a detect range of 5, and a chosen distance of 3, our scale modifier will be 0.4f.
                 //At a range of 5 with chosen distance of 1, our scale modifeier will be 0.8f;
-                scaling = (detectRange - chosen) * 0.5f + 1;
-            }
-
-            if(detectRange - chosen > detectRange - 1)
-            {
-                Debug.Log("On");
+                scaling =  (1 - (chosen/detectRange)) * (maxSize) + 1;
+                //Debug.Log(scaling);
                 onColor = true;
             }
             else
@@ -83,7 +94,7 @@ public class NodeFeedback : MonoBehaviour {
         }
         else
         {
-            Debug.Log("no controllers....");
+
             controller1 = GameObject.Find("Controller1");
             controller2 = GameObject.Find("Controller2");
         }

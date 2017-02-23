@@ -12,6 +12,11 @@ public class DoorMaster : MonoBehaviour {
 
     protected bool allClosed = false;
 
+    void Start()
+    {
+        doorIndex = openDoor;
+    }
+
     void Update()
     {
         if (!allClosed)

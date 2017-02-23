@@ -90,7 +90,7 @@ public class RotationController : MonoBehaviour {
                 currentPuzzle.transform.gameObject.GetComponent<BoxCollider>().enabled = true;
                 isTouchingPuzzle = false;
                 shouldRotate = false;
-                Debug.Log("Stopped");
+
                 currentPuzzle.GetComponent<PuzzleManager>().play = false;
                 currentPuzzle = null;
             }
