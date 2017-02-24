@@ -14,6 +14,8 @@ public class DrawFromController : MonoBehaviour {
     public float durationOfFinishRumble = 1.5f; //Used when finished connection to receiver 
     public float powerOfFinishRumble = 0.9f; //Used when finished onnection to receiver 
 
+    public GameObject gameManager;
+
     // Use this for initialization
     void Start () {
         trackedObj = transform.parent.GetComponent<SteamVR_TrackedObject>();

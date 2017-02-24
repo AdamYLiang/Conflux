@@ -9,6 +9,8 @@ public class NodeFeedback : MonoBehaviour {
     public GameObject controller1, controller2;
     public float growTime = 1f;
 
+    protected GameObject gameManager;
+
     public Color closeColor;
     protected Color originalColor;
 
@@ -21,8 +23,9 @@ public class NodeFeedback : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        controller1 = GameObject.Find("Controller (left)");
-        controller2 = GameObject.Find("Controller (right)");
+        gameManager = GameObject.Find("GameManager");
+        controller1 = gameManager.GetComponent<GameManager>().controller1;
+        controller2 = gameManager.GetComponent<GameManager>().controller2;
         originalScale = transform.GetChild(0).localScale;
         ourMat = transform.GetChild(0).GetComponent<Renderer>().material;
 	}
@@ -30,16 +33,6 @@ public class NodeFeedback : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        if(controller1 == null)
-        {
-            controller1 = GameObject.Find("Controller (left)");
-        }
-
-        if(controller2 == null)
-        {
-            controller2 = GameObject.Find("Controller (right)");
-        }
-
         if(controller1 != null && controller2 != null)
         {
             //Calculate the distance from controller to node
@@ -57,11 +50,6 @@ public class NodeFeedback : MonoBehaviour {
                 chosen = distance;
             }
 
-            if (chosen < detectRange)
-            {
-                //Debug.Log(chosen);
-            }
-
             //Default 1 will keep it the normal size. We want hte min to be 1, and the max to be maxSize.
             //We want it to scale bigger the closer it gets to 0. Our max range of default scaling should be detectRange
             float scaling = 1;
@@ -71,8 +59,12 @@ public class NodeFeedback : MonoBehaviour {
                 //DetectRange - chosen will be greater the smaller chosen is, i.e. closer to the node
                 //Thus, with a detect range of 5, and a chosen distance of 3, our scale modifier will be 0.4f.
                 //At a range of 5 with chosen distance of 1, our scale modifeier will be 0.8f;
-                scaling =  (1 - (chosen/detectRange)) * (maxSize) + 1;
-                //Debug.Log(scaling);
+                scaling = (detectRange - chosen) * 0.5f + 1;
+            }
+
+            if(detectRange - chosen > detectRange - 1)
+            {
+                Debug.Log("On");
                 onColor = true;
             }
             else
@@ -91,12 +83,6 @@ public class NodeFeedback : MonoBehaviour {
 
             ourMat.color = Color.Lerp(originalColor, closeColor, colorStep);
             transform.GetChild(0).localScale = originalScale * scaling;
-        }
-        else
-        {
-
-            controller1 = GameObject.Find("Controller1");
-            controller2 = GameObject.Find("Controller2");
         }
     }
 }
