@@ -12,6 +12,9 @@ public class DoorMaster : MonoBehaviour {
 
     protected bool allClosed = false;
 
+    public bool locked; //Locked by default, if it is not locked then the doors will behave normally and turn
+    public GameObject puzzleUnlocker;
+
     void Start()
     {
         doorIndex = openDoor;
@@ -19,25 +22,30 @@ public class DoorMaster : MonoBehaviour {
 
     void Update()
     {
-        if (!allClosed)
+
+        if (!locked)
         {
-            for (int i = 0; i < door.Count; i++)
+
+            if (!allClosed)
             {
-                if (i != doorIndex)
+                for (int i = 0; i < door.Count; i++)
+                {
+                    if (i != doorIndex)
+                    {
+                        door[i].SetActive(true);
+                    }
+                    else
+                    {
+                        door[i].SetActive(false);
+                    }
+                }
+            }
+            else //All doors should be closed
+            {
+                for (int i = 0; i < door.Count; i++)
                 {
                     door[i].SetActive(true);
                 }
-                else
-                {
-                    door[i].SetActive(false);
-                }
-            }
-        }
-        else //All doors should be closed
-        {
-            for(int i = 0; i < door.Count; i++)
-            {
-                door[i].SetActive(true);
             }
         }
         
