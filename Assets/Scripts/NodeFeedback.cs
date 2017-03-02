@@ -24,8 +24,12 @@ public class NodeFeedback : MonoBehaviour {
 	void Start ()
     {
         gameManager = GameObject.Find("GameManager");
-        controller1 = gameManager.GetComponent<GameManager>().controller1;
-        controller2 = gameManager.GetComponent<GameManager>().controller2;
+
+        if (controller1 != null && controller2 != null)
+        {
+            controller1 = gameManager.GetComponent<GameManager>().controller1;
+            controller2 = gameManager.GetComponent<GameManager>().controller2;
+        }
         originalScale = transform.GetChild(0).localScale;
         ourMat = transform.GetChild(0).GetComponent<Renderer>().material;
 	}
