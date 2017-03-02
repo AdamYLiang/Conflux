@@ -41,6 +41,9 @@ public class StartButton : MonoBehaviour {
     public UnityEvent OnStandInside = new UnityEvent();
     public UnityEvent OnFinishRotation = new UnityEvent();
 
+    //The player camera rig to rotate
+    protected GameObject thePlayerRig;
+
     void Start()
     {
         waitTimer = 0;
@@ -91,6 +94,7 @@ public class StartButton : MonoBehaviour {
         Debug.Log(col.name);
         if (col.transform.root.transform.name == "[CameraRig]")
         {
+            thePlayerRig = col.transform.root.gameObject;
             entered = true;
         }
     }
@@ -100,6 +104,11 @@ public class StartButton : MonoBehaviour {
     {
         if (col.transform.root.transform.name == "[CameraRig]")
         {
+            thePlayerRig = null;
+            if (thePlayerRig != null)
+            {
+                thePlayerRig.transform.parent = null;
+            }
             entered = false;
         }
         //If we aren't firing once reset the correct bools.
@@ -121,9 +130,13 @@ public class StartButton : MonoBehaviour {
         {
             obj.transform.RotateAround(transform.position, Vector3.up, 1f);
             totalRotation += 1f;
-            if(totalRotation == rotation)
+            if(totalRotation >= rotation)
             {
                 finishedRotating = true;
+                if(thePlayerRig != null)
+                {
+                    thePlayerRig.transform.parent = null;
+                }
             }
             yield return new WaitForSeconds(Time.deltaTime);
         }
@@ -133,7 +146,8 @@ public class StartButton : MonoBehaviour {
     //Rotate object around us
     public void RotateObjectAround(GameObject obj)
     {
-        StartCoroutine(RotateObj(obj, 180f));
+        obj.transform.parent = this.transform.root; 
+        StartCoroutine(RotateObj(this.transform.root.gameObject, 180f));
     }
 
 }

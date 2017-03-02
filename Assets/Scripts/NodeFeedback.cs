@@ -9,6 +9,8 @@ public class NodeFeedback : MonoBehaviour {
     public GameObject controller1, controller2;
     public float growTime = 1f;
 
+    protected GameObject gameManager;
+
     public Color closeColor;
     protected Color originalColor;
 
@@ -21,8 +23,13 @@ public class NodeFeedback : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        controller1 = GameObject.Find("Controller (left)");
-        controller2 = GameObject.Find("Controller (right)");
+        gameManager = GameObject.Find("GameManager");
+
+        if (controller1 != null && controller2 != null)
+        {
+            controller1 = gameManager.GetComponent<GameManager>().controller1;
+            controller2 = gameManager.GetComponent<GameManager>().controller2;
+        }
         originalScale = transform.GetChild(0).localScale;
         ourMat = transform.GetChild(0).GetComponent<Renderer>().material;
 	}
@@ -80,12 +87,6 @@ public class NodeFeedback : MonoBehaviour {
 
             ourMat.color = Color.Lerp(originalColor, closeColor, colorStep);
             transform.GetChild(0).localScale = originalScale * scaling;
-        }
-        else
-        {
-            Debug.Log("no controllers....");
-            controller1 = GameObject.Find("Controller1");
-            controller2 = GameObject.Find("Controller2");
         }
     }
 }

@@ -12,6 +12,11 @@ public class DoorMaster : MonoBehaviour {
 
     protected bool allClosed = false;
 
+    void Start()
+    {
+        doorIndex = openDoor;
+    }
+
     void Update()
     {
         if (!allClosed)
@@ -45,11 +50,11 @@ public class DoorMaster : MonoBehaviour {
 
 	public void openNextDoor()
     {
-        doorIndex++;
-        if(doorIndex == door.Count)
-        {
-            doorIndex = 0;
-        }
+        //doorIndex++;
+        //if(doorIndex == door.Count)
+        //{
+        //    doorIndex = 0;
+        //}
         openDoor = doorIndex;
         allClosed = false;
     }

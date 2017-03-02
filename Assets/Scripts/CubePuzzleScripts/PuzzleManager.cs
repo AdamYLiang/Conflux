@@ -94,6 +94,7 @@ public class PuzzleManager : MonoBehaviour {
             }
             else if(!play && !editor)
             {
+                
                 randomRotation.x = Mathf.Clamp(randomRotation.x + Random.Range(0, 10f), -20, 20f);
                 randomRotation.y = Mathf.Clamp(randomRotation.y + Random.Range(0, 10f), -20, 20f);
                 randomRotation.z = Mathf.Clamp(randomRotation.z + Random.Range(0, 10f), -20, 20f);
@@ -146,6 +147,7 @@ public class PuzzleManager : MonoBehaviour {
         }
         GetComponent<Collider>().enabled = false;
         allActive = false;
+        hidden = true;
       
     }
 
@@ -161,6 +163,7 @@ public class PuzzleManager : MonoBehaviour {
         }
         GetComponent<Collider>().enabled = true;
         allActive = true;
+        hidden = false;
 
     
     }
