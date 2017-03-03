@@ -65,7 +65,7 @@ public class RotationController : MonoBehaviour {
             //And you are touching a button, set it to play and deactivate the box collider
             if (isTouchingPuzzle)
             {
-                currentPuzzle.GetComponent<PuzzleManager>().play = true;
+                //currentPuzzle.GetComponent<PuzzleManager>().play = true;
                 currentPuzzle.transform.gameObject.GetComponent<BoxCollider>().enabled = false;
                 rotationStartPosition = transform.position;
                 lastPuzzle = null;
@@ -91,7 +91,7 @@ public class RotationController : MonoBehaviour {
                 isTouchingPuzzle = false;
                 shouldRotate = false;
 
-                currentPuzzle.GetComponent<PuzzleManager>().play = false;
+                //currentPuzzle.GetComponent<PuzzleManager>().play = false;
                 currentPuzzle = null;
             }
         }
@@ -106,30 +106,30 @@ public class RotationController : MonoBehaviour {
             lockRotation = false;
         }
 
-        //If the player is grabbing a puzzle they can rotate it based on controller movement
-        if (shouldRotate && !lockRotation)
-        {
-            updatedPosition = transform.position;
-            Vector3 directionToUpdate = (updatedPosition - rotationStartPosition);
+        ////If the player is grabbing a puzzle they can rotate it based on controller movement
+        //if (shouldRotate && !lockRotation)
+        //{
+        //    updatedPosition = transform.position;
+        //    Vector3 directionToUpdate = (updatedPosition - rotationStartPosition);
 
-            //Call on method to account for the correct face to rotate in the proper direction
-            doRotation(directionToUpdate);
+        //    //Call on method to account for the correct face to rotate in the proper direction
+        //    doRotation(directionToUpdate);
 
-            //Debug.Log("Direction is: " + directionToUpdate + " the angles are " + currentPuzzle.transform.eulerAngles);
+        //    //Debug.Log("Direction is: " + directionToUpdate + " the angles are " + currentPuzzle.transform.eulerAngles);
 
-            //currentPuzzle.transform.Rotate(directionToUpdate, Space.World);
-        }
+        //    //currentPuzzle.transform.Rotate(directionToUpdate, Space.World);
+        //}
 
-        //If the player has let go of the object AND it should continue rotating after flick
-        if (continueRotate && !shouldRotate)
-        {
-            rotX = tempRotX * percentage;
-            rotY = tempRotY * percentage;
-            rotZ = tempRotZ * percentage;
-            percentage = Mathf.Clamp01(percentage - Time.deltaTime / rotDecayTime);
+        ////If the player has let go of the object AND it should continue rotating after flick
+        //if (continueRotate && !shouldRotate)
+        //{
+        //    rotX = tempRotX * percentage;
+        //    rotY = tempRotY * percentage;
+        //    rotZ = tempRotZ * percentage;
+        //    percentage = Mathf.Clamp01(percentage - Time.deltaTime / rotDecayTime);
             
-            ContinueRotate(lastPuzzle, rotX, rotY, rotZ);
-        }
+        //    ContinueRotate(lastPuzzle, rotX, rotY, rotZ);
+        //}
 
     }
 
