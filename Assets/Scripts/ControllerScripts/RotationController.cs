@@ -65,7 +65,7 @@ public class RotationController : MonoBehaviour {
             //And you are touching a button, set it to play and deactivate the box collider
             if (isTouchingPuzzle)
             {
-                currentPuzzle.GetComponent<PuzzleManager>().play = true;
+                //currentPuzzle.GetComponent<PuzzleManager>().play = true;
                 currentPuzzle.transform.gameObject.GetComponent<BoxCollider>().enabled = false;
                 rotationStartPosition = transform.position;
                 lastPuzzle = null;
@@ -91,7 +91,7 @@ public class RotationController : MonoBehaviour {
                 isTouchingPuzzle = false;
                 shouldRotate = false;
 
-                currentPuzzle.GetComponent<PuzzleManager>().play = false;
+                //currentPuzzle.GetComponent<PuzzleManager>().play = false;
                 currentPuzzle = null;
             }
         }

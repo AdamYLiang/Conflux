@@ -13,7 +13,13 @@ public class DoorMaster : MonoBehaviour {
     protected bool allClosed = false;
 
     public bool locked; //Locked by default, if it is not locked then the doors will behave normally and turn
-    public GameObject puzzleUnlocker;
+    public GameObject puzzleUnlocker; //The puzzle that unlocks said door
+
+    //Assumes 1 door can only go between 2 rooms, assign both doors and then set them inactive when rotating
+    //Assign each manually in inspector 
+    public GameObject Room1; //starting room
+    public GameObject Room2; //ending room
+    protected bool usedRoom = false; //When set to true, will flip which rooms to set active and inactive
 
     void Start()
     {
@@ -48,16 +54,40 @@ public class DoorMaster : MonoBehaviour {
                 }
             }
         }
+
+        //If the puzzle to unlock the door exists
+        if (puzzleUnlocker != null)
+        {
+            //If the puzzle is finished then unlock the door 
+            if (puzzleUnlocker.GetComponent<PuzzleManager>().finished)
+            {
+                locked = false;
+            }
+        }
         
     }
 
     public void closeAllDoor()
     {
+        Room1.SetActive(false);
+        Room2.SetActive(false);
         allClosed = true;
     }
 
-	public void openNextDoor()
+    public void openNextDoor()
     {
+
+        if (usedRoom)
+        {
+            Room1.SetActive(true);
+            usedRoom = false;
+        }
+
+        else
+        {
+            Room2.SetActive(true);
+            usedRoom = true;
+        }
         //doorIndex++;
         //if(doorIndex == door.Count)
         //{
