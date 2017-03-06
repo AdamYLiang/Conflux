@@ -23,11 +23,14 @@ public class PuzzleObject : MonoBehaviour {
     public SteamVR_TrackedObject trackedObj;
 
     public GameObject gameManager;
+    protected GameManager gm;
+
 
     // Use this for initialization
     void Start () {
         puzzle.GetComponent<PuzzleManager>().HideCube();
         gameManager = GameObject.Find("GameManager");
+        gm = gameManager.GetComponent<GameManager>();
         miniScale = puzzle.transform.localScale * miniatureFactor;
         playScale = puzzle.transform.localScale * playFactor;
     }
@@ -96,26 +99,62 @@ public class PuzzleObject : MonoBehaviour {
         StartCoroutine(ShowPuzzleCoroutine());
     }
 
-    void OnTriggerEenter(Collider col)
+    void OnTriggerStay(Collider col)
     {
-        //Controller2 is the right controller
-        if(gameManager.GetComponent<GameManager>().rightController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) &&
-            col.transform.parent == gameManager.GetComponent<GameManager>().controller2)
-        {
-            if (!lerping)
-            {
-                if (!puzzleShowing)
-                {
-                    ShowPuzzle();
-                    puzzleShowing = true;
-                }
-                else
-                {
-                    HidePuzzle();
-                    puzzleShowing = false;
-                }
+        //Debug.Log(col.name);
 
+        if(gm.leftController != null)
+        {
+            if (gm.leftController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
+            {
+                Debug.Log("Pressing");
+            }
+
+            if (gm.leftController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) &&
+            col.transform.parent == gm.controller1)
+            {
+                if (!lerping)
+                {
+                    if (!puzzleShowing)
+                    {
+                        ShowPuzzle();
+                        puzzleShowing = true;
+                    }
+                    else
+                    {
+                        HidePuzzle();
+                        puzzleShowing = false;
+                    }
+
+                }
             }
         }
+       
+        if(gm.rightController != null)
+        {
+            if (gm.rightController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) &&
+                col.transform.parent.gameObject == gm.controller2)
+            {
+                Debug.Log("Right");
+                if (!lerping)
+                {
+                    if (!puzzleShowing)
+                    {
+                        ShowPuzzle();
+                        puzzleShowing = true;
+                    }
+                    else
+                    {
+                        HidePuzzle();
+                        puzzleShowing = false;
+                    }
+
+                }
+            }
+        }
+      
+
+        //Controller2 is the right controller
+        
     }
 }

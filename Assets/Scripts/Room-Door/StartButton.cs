@@ -41,6 +41,9 @@ public class StartButton : MonoBehaviour {
     public UnityEvent OnStandInside = new UnityEvent();
     public UnityEvent OnFinishRotation = new UnityEvent();
 
+    //The player camera rig to rotate
+    protected GameObject thePlayerRig;
+
     void Start()
     {
         waitTimer = 0;
@@ -91,6 +94,7 @@ public class StartButton : MonoBehaviour {
         Debug.Log(col.name);
         if (col.transform.root.transform.name == "[CameraRig]")
         {
+            thePlayerRig = col.transform.root.gameObject;
             entered = true;
         }
     }
@@ -100,6 +104,11 @@ public class StartButton : MonoBehaviour {
     {
         if (col.transform.root.transform.name == "[CameraRig]")
         {
+            thePlayerRig = null;
+            if (thePlayerRig != null)
+            {
+                thePlayerRig.transform.parent = null;
+            }
             entered = false;
         }
         //If we aren't firing once reset the correct bools.
@@ -113,31 +122,32 @@ public class StartButton : MonoBehaviour {
         }
     }
 
-    public IEnumerator RotateObj(GameObject obj, float lerpTime)
+    public IEnumerator RotateObj(GameObject obj, float rotation)
     {
-        float step = 0f;
-        Quaternion originalRotation = obj.transform.rotation;
-        Quaternion flip = Quaternion.Euler(0, 180, 0);
-        Quaternion flippedRotation = new Quaternion(flip.x + originalRotation.x, flip.y + originalRotation.y,
-            flip.z + originalRotation.z, flip.w + originalRotation.w);
-        
-        
-        while (step < 1)
+        bool finishedRotating = false;
+        float totalRotation = 0f;
+        while (!finishedRotating)
         {
-            step += Time.deltaTime / lerpTime;
-            Quaternion target = Quaternion.Lerp(originalRotation, flippedRotation, step);
-            float angle = Quaternion.Angle(transform.rotation, target);
-            Debug.Log(angle);
-            obj.transform.Rotate(Vector3.up, angle);
+            obj.transform.RotateAround(transform.position, Vector3.up, 1f);
+            totalRotation += 1f;
+            if(totalRotation >= rotation)
+            {
+                finishedRotating = true;
+                if(thePlayerRig != null)
+                {
+                    thePlayerRig.transform.parent = null;
+                }
+            }
             yield return new WaitForSeconds(Time.deltaTime);
         }
         OnFinishRotation.Invoke();
     }
 
-    //Rotate object around us. The 5 is the time rotation
+    //Rotate object around us
     public void RotateObjectAround(GameObject obj)
     {
-        StartCoroutine(RotateObj(obj, 5));
+        obj.transform.parent = this.transform.root; 
+        StartCoroutine(RotateObj(this.transform.root.gameObject, 180f));
     }
 
 }
