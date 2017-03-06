@@ -113,27 +113,31 @@ public class StartButton : MonoBehaviour {
         }
     }
 
-    public IEnumerator RotateObj(GameObject obj, float rotation)
+    public IEnumerator RotateObj(GameObject obj, float lerpTime)
     {
-        bool finishedRotating = false;
-        float totalRotation = 0f;
-        while (!finishedRotating)
+        float step = 0f;
+        Quaternion originalRotation = obj.transform.rotation;
+        Quaternion flip = Quaternion.Euler(0, 180, 0);
+        Quaternion flippedRotation = new Quaternion(flip.x + originalRotation.x, flip.y + originalRotation.y,
+            flip.z + originalRotation.z, flip.w + originalRotation.w);
+        
+        
+        while (step < 1)
         {
-            obj.transform.RotateAround(transform.position, Vector3.up, 1f);
-            totalRotation += 1f;
-            if(totalRotation == rotation)
-            {
-                finishedRotating = true;
-            }
+            step += Time.deltaTime / lerpTime;
+            Quaternion target = Quaternion.Lerp(originalRotation, flippedRotation, step);
+            float angle = Quaternion.Angle(transform.rotation, target);
+            Debug.Log(angle);
+            obj.transform.Rotate(Vector3.up, angle);
             yield return new WaitForSeconds(Time.deltaTime);
         }
         OnFinishRotation.Invoke();
     }
 
-    //Rotate object around us
+    //Rotate object around us. The 5 is the time rotation
     public void RotateObjectAround(GameObject obj)
     {
-        StartCoroutine(RotateObj(obj, 180f));
+        StartCoroutine(RotateObj(obj, 5));
     }
 
 }

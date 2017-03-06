@@ -12,6 +12,11 @@ public class DoorMaster : MonoBehaviour {
 
     protected bool allClosed = false;
 
+    void Start()
+    {
+        doorIndex = openDoor;
+    }
+
     void Update()
     {
         if (!allClosed)
@@ -36,6 +41,28 @@ public class DoorMaster : MonoBehaviour {
             }
         }
         
+    }
+
+    public void FlipDoor(float timeTaken)
+    {
+        StartCoroutine(FlipDoorCoroutine(timeTaken));
+    }
+
+    public IEnumerator FlipDoorCoroutine(float timeTaken)
+    {
+        float timeDuration = timeTaken;
+        float step = 0f;
+        Quaternion originalRotation = transform.rotation;
+        Quaternion flip = Quaternion.Euler(0, 180, 0);
+        Quaternion flippedRotation = new Quaternion(flip.x + originalRotation.x, flip.y + originalRotation.y,
+            flip.z + originalRotation.z, flip.w + originalRotation.w);
+
+        while (step < 1)
+        {
+            transform.rotation = Quaternion.Lerp(originalRotation, flippedRotation, step);
+            step += Time.deltaTime / timeTaken;
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
     }
 
     public void closeAllDoor()
