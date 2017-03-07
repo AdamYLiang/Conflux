@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PuzzleManager : MonoBehaviour {
 
@@ -14,10 +15,12 @@ public class PuzzleManager : MonoBehaviour {
     public float colorChangeSpeed = 3f;
     public MeshRenderer targetRenderer;
     Vector3 randomRotation = new Vector3(1, 1, 1);
+    public UnityEvent OnPuzzleComplete = new UnityEvent();
 
     private bool allActive = true;
     private Light glow;
     private bool changing = false, color1 = false, color2 = true;
+    private bool finishInvoked = false;
     private float colorChangeTimer = 0f; 
     private Transform playTiles;
     private Color targetColor, currentColor;
@@ -107,12 +110,14 @@ public class PuzzleManager : MonoBehaviour {
                 transform.Rotate(new Vector3(Random.Range(10, 20), Random.Range(10, 20), Random.Range(10, 20)) * Time.deltaTime);
                 //transform.rotation = Quaternion.Euler(transform.eulerAngles + (new Vector3(20, 5, 0) * Time.deltaTime));
             }*/
-
-            if (Input.GetKeyDown(KeyCode.B))
-            {
-                play = !play;
-            }
         }
+
+        if (!finishInvoked && finished)
+        {
+            OnPuzzleComplete.Invoke();
+            finishInvoked = true;
+        }
+
 	}
 
     public IEnumerator HidePuzzle()

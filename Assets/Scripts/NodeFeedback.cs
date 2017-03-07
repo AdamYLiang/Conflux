@@ -25,11 +25,9 @@ public class NodeFeedback : MonoBehaviour {
     {
         gameManager = GameObject.Find("GameManager");
 
-        if (controller1 != null && controller2 != null)
-        {
-            controller1 = gameManager.GetComponent<GameManager>().controller1;
-            controller2 = gameManager.GetComponent<GameManager>().controller2;
-        }
+        controller1 = gameManager.GetComponent<GameManager>().controller1;
+        controller2 = gameManager.GetComponent<GameManager>().controller2;
+
         originalScale = transform.GetChild(0).localScale;
         ourMat = transform.GetChild(0).GetComponent<Renderer>().material;
 	}
@@ -37,7 +35,9 @@ public class NodeFeedback : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        if(controller1 != null && controller2 != null)
+        controller1 = gameManager.GetComponent<GameManager>().controller1;
+        controller2 = gameManager.GetComponent<GameManager>().controller2;
+        if (controller1 != null && controller2 != null)
         {
             //Calculate the distance from controller to node
             float distance = (controller1.transform.position - transform.position).magnitude;
@@ -63,12 +63,7 @@ public class NodeFeedback : MonoBehaviour {
                 //DetectRange - chosen will be greater the smaller chosen is, i.e. closer to the node
                 //Thus, with a detect range of 5, and a chosen distance of 3, our scale modifier will be 0.4f.
                 //At a range of 5 with chosen distance of 1, our scale modifeier will be 0.8f;
-                scaling = (detectRange - chosen) * 0.5f + 1;
-            }
-
-            if(detectRange - chosen > detectRange - 1)
-            {
-                Debug.Log("On");
+                scaling = (1 - (chosen / detectRange)) * (maxSize) + 1;
                 onColor = true;
             }
             else
