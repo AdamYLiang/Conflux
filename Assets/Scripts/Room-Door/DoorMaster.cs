@@ -11,6 +11,7 @@ public class DoorMaster : MonoBehaviour {
     protected bool allClosed = false;
 
     public bool locked; //Locked by default, if it is not locked then the doors will behave normally and turn
+    private bool lockedChanged= false;
     public GameObject puzzleUnlocker; //The puzzle that unlocks said door
 
     //Assumes 1 door can only go between 2 rooms, assign both doors and then set them inactive when rotating
@@ -22,9 +23,15 @@ public class DoorMaster : MonoBehaviour {
     void Update()
     {
 
-        if (!locked)
+        if (locked && lockedChanged)
         {
-          
+            door[0].GetComponent<AirlockAnimationController>().CloseDoorIgnoreEvent();
+            lockedChanged = false;
+        }
+        else if (!locked && lockedChanged)
+        {
+            door[0].GetComponent<AirlockAnimationController>().OpenDoorIgnoreEvent();
+            lockedChanged = false;
         }
 
         /*
@@ -65,6 +72,12 @@ public class DoorMaster : MonoBehaviour {
         {
             Room2.SetActive(true);
         }
+    }
+
+    public void SetLock(bool state)
+    {
+        locked = state;
+        lockedChanged = true;
     }
 
     public void openNextDoor()
