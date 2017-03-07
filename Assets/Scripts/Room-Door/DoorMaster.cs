@@ -6,9 +6,7 @@ public class DoorMaster : MonoBehaviour {
 
     public List<GameObject> door;
 
-    public int openDoor = 0;
-	
-    protected int doorIndex = 0;
+    protected int roomIndex = 0;
 
     protected bool allClosed = false;
 
@@ -21,40 +19,15 @@ public class DoorMaster : MonoBehaviour {
     public GameObject Room2; //ending room
     protected bool usedRoom = false; //When set to true, will flip which rooms to set active and inactive
 
-    void Start()
-    {
-        doorIndex = openDoor;
-    }
-
     void Update()
     {
 
         if (!locked)
         {
-
-            if (!allClosed)
-            {
-                for (int i = 0; i < door.Count; i++)
-                {
-                    if (i != doorIndex)
-                    {
-                        door[i].SetActive(true);
-                    }
-                    else
-                    {
-                        door[i].SetActive(false);
-                    }
-                }
-            }
-            else //All doors should be closed
-            {
-                for (int i = 0; i < door.Count; i++)
-                {
-                    door[i].SetActive(true);
-                }
-            }
+          
         }
 
+        /*
         //If the puzzle to unlock the door exists
         if (puzzleUnlocker != null)
         {
@@ -63,15 +36,35 @@ public class DoorMaster : MonoBehaviour {
             {
                 locked = false;
             }
-        }
+        }*/
         
     }
 
-    public void closeAllDoor()
+    public void SetRoomsInactive()
     {
         Room1.SetActive(false);
         Room2.SetActive(false);
-        allClosed = true;
+        if(roomIndex == 0)
+        {
+            roomIndex = 1;
+        }
+        else
+        {
+            roomIndex = 0;
+        }
+    }
+
+    //Sets the right room active
+    public void SetRoomActive()
+    {
+        if(roomIndex == 0)
+        {
+            Room1.SetActive(true);
+        }
+        else
+        {
+            Room2.SetActive(true);
+        }
     }
 
     public void openNextDoor()
@@ -88,12 +81,6 @@ public class DoorMaster : MonoBehaviour {
             Room2.SetActive(true);
             usedRoom = true;
         }
-        //doorIndex++;
-        //if(doorIndex == door.Count)
-        //{
-        //    doorIndex = 0;
-        //}
-        openDoor = doorIndex;
         allClosed = false;
     }
 }
