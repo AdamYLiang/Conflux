@@ -107,7 +107,7 @@ public class StartButton : MonoBehaviour {
             thePlayerRig = null;
             if (thePlayerRig != null)
             {
-                thePlayerRig.transform.parent = null;
+                thePlayerRig.transform.SetParent(null);
             }
             entered = false;
         }
@@ -124,6 +124,7 @@ public class StartButton : MonoBehaviour {
 
     public IEnumerator RotateObj(GameObject obj, float rotation)
     {
+        Debug.Log(obj);
         bool finishedRotating = false;
         float totalRotation = 0f;
         while (!finishedRotating)
@@ -133,9 +134,10 @@ public class StartButton : MonoBehaviour {
             if(totalRotation >= rotation)
             {
                 finishedRotating = true;
+                
                 if(thePlayerRig != null)
                 {
-                    thePlayerRig.transform.parent = null;
+                    thePlayerRig.transform.SetParent(null);
                 }
             }
             yield return new WaitForSeconds(Time.deltaTime);
@@ -146,8 +148,8 @@ public class StartButton : MonoBehaviour {
     //Rotate object around us
     public void RotateObjectAround(GameObject obj)
     {
-        obj.transform.parent = this.transform.root; 
-        StartCoroutine(RotateObj(this.transform.root.gameObject, 180f));
+        obj.transform.parent = transform.parent;
+        StartCoroutine(RotateObj(transform.parent.gameObject, 180f));
     }
 
 }
