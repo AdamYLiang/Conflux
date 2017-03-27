@@ -6,6 +6,9 @@ public class ConnectionNOde : MonoBehaviour {
 
     public bool connected = false;
 
+    public enum NodeType { Cube, Other };
+    public NodeType type;
+
     ConnectedInfo info;
 
     void Start()
