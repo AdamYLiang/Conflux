@@ -63,7 +63,11 @@ public class NodeFeedback : MonoBehaviour {
                 //DetectRange - chosen will be greater the smaller chosen is, i.e. closer to the node
                 //Thus, with a detect range of 5, and a chosen distance of 3, our scale modifier will be 0.4f.
                 //At a range of 5 with chosen distance of 1, our scale modifeier will be 0.8f;
-                scaling = (1 - (chosen / detectRange)) * (maxSize) + 1;
+                scaling = 1 - ((chosen / detectRange)) * (maxSize);
+                if(scaling < 0)
+                {
+                    scaling = 0;
+                }
                 onColor = true;
             }
             else
