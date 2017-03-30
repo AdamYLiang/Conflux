@@ -110,27 +110,27 @@ public class DrawFromController : MonoBehaviour {
                     if (!col.transform.parent.GetComponent<ConnectionNOde>().connected)
                     {
                         Vector3 position = col.transform.parent.position;
-                        emitter.GetComponent<EmitterScript>().AddLineNode(col.gameObject);
+                        bool valid = emitter.GetComponent<EmitterScript>().AddLineNode(col.gameObject);
                         Debug.Log("Receiver isn't connected... Let's connect it to our emitter.");
 
-                        ConnectedInfo info = col.transform.parent.GetComponent<ConnectedInfo>();
-                        info.receivedLaserColor = emitter.GetComponent<EmitterScript>().laserColor;
-                        info.received = true;
-                        emitter.GetComponent<EmitterScript>().connected = true;
+                        if (valid)
+                        {
+                            ConnectedInfo info = col.transform.parent.GetComponent<ConnectedInfo>();
+                            info.receivedLaserColor = emitter.GetComponent<EmitterScript>().laserColor;
+                            info.received = true;
+                            emitter.GetComponent<EmitterScript>().connected = true;
 
-                        //Rumble it
-                        StartCoroutine(RumbleController(durationOfFinishRumble, powerOfFinishRumble));
+                            //Rumble it
+                            StartCoroutine(RumbleController(durationOfFinishRumble, powerOfFinishRumble));
 
-                        //Disconnect us from this emitter after connecting.
-                        emitter.GetComponent<EmitterScript>().EndDraw();
-                        emitter = null;
+                            //Disconnect us from this emitter after connecting.
+                            emitter.GetComponent<EmitterScript>().EndDraw();
+                            emitter = null;
+                        }
                     }
-                    
                 }
-
             }
         }
-
     }
 
     //Coroutine to rumble controller, takes the power and the duration and then lerps it while changing the pulse 
