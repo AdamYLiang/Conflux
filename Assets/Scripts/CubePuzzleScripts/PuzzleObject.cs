@@ -68,7 +68,7 @@ public class PuzzleObject : MonoBehaviour {
         float step = 0f;
         Vector3 showPosition = transform.position + Vector3.up * 1;
         Vector3 originalposition = transform.position;
-        puzzle.GetComponent<PuzzleManager>().ShowCube();
+        puzzle.GetComponent<PuzzleManager>().ShowPuzzle();
         lerping = true;
         while (true)
         {

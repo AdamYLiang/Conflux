@@ -10,6 +10,8 @@ public class PuzzleManager : MonoBehaviour {
     public bool play = false;
     public bool finished = false;
     public bool editor = false;
+    public enum PuzzleType { Cube, Wall, Other };
+    public PuzzleType type;
     public bool hidden = false;
     public Color uncompleteColor, completeColor;
     public float colorChangeSpeed = 3f;
@@ -28,8 +30,8 @@ public class PuzzleManager : MonoBehaviour {
 
     void Start()
     {
-        glow = transform.FindChild("Glow").GetComponent<Light>();
-        glow.color = uncompleteColor;
+        //glow = transform.FindChild("Glow").GetComponent<Light>();
+        //glow.color = uncompleteColor;
         playTiles = transform.FindChild("PlayTiles");
         
         SetAllColor(uncompleteColor);
@@ -46,7 +48,7 @@ public class PuzzleManager : MonoBehaviour {
         }
         else
         {
-            ShowCube();
+            ShowPuzzle();
             if (targetRenderer == null)
             {
                 targetRenderer = playTiles.GetChild(0).GetComponent<MeshRenderer>();
@@ -83,7 +85,7 @@ public class PuzzleManager : MonoBehaviour {
                     }
                     colorChangeTimer += step;
                     SetAllColor(Color.Lerp(originalColor, targetColor, colorChangeTimer));
-                    glow.color = Color.Lerp(originalColor, targetColor, colorChangeTimer);
+                    //glow.color = Color.Lerp(originalColor, targetColor, colorChangeTimer);
                     //currentColor = glow.color;
                     if (colorChangeTimer >= 1.0f)
                     {
@@ -157,8 +159,9 @@ public class PuzzleManager : MonoBehaviour {
     }
 
     //Show the cube
-    public void ShowCube()
+    public void ShowPuzzle()
     {
+       
         if (!allActive)
         {
             for (int i = 0; i < transform.childCount; i++)
@@ -166,7 +169,10 @@ public class PuzzleManager : MonoBehaviour {
                 transform.GetChild(i).transform.gameObject.SetActive(true);
             }
         }
-        GetComponent<Collider>().enabled = true;
+        if (type == PuzzleType.Cube)
+        {
+            GetComponent<Collider>().enabled = true;
+        }    
         allActive = true;
         hidden = false;
 

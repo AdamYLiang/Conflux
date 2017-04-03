@@ -4,18 +4,82 @@ using UnityEngine;
 
 public class ControllerColDetect : MonoBehaviour
 {
+    public GameObject selected = null;
+    private GameObject highlighted = null;
+
+    public Material oldMat = null;
+
+    //Applies the shader to the transform.
+    public void ApplyHighlight(Transform trans)
+    {
+        oldMat = trans.GetComponent<MeshRenderer>().material;
+        Material mat = new Material(Shader.Find("Custom/HighlightShader"));
+        mat.CopyPropertiesFromMaterial(oldMat);
+        trans.GetComponent<MeshRenderer>().material = mat;
+    }
+
+    //Resets the shader of the given transform if possible.
+    public bool RemoveHighlight(Transform trans)
+    {
+        if (oldMat != null)
+        {
+            trans.GetComponent<MeshRenderer>().material = oldMat;
+            oldMat = null;
+            return true;
+        }
+        return false;
+
+    }
+
+    void Update()
+    {
+        //If the selected obj is not the one that is highlighted, we have a new selected.
+        if(selected != highlighted)
+        {
+            //If the highlighted wasn't null, we need to reset the old highlighted obj.
+            if(highlighted != null)
+            {
+                RemoveHighlight(highlighted.transform);
+            }
+            
+            //If the selected obj isn't null, we need to apply the highlight.
+            if(selected != null)
+            {
+                ApplyHighlight(selected.transform);
+            }
+            
+            //Regardless of what happened the highlighted object should now be the selected.
+            highlighted = selected;
+        }
+    }
+
+    void OnTriggerEnter(Collider col)
+    {
+        if (col.CompareTag("Interactable"))
+        {
+            selected = col.gameObject;
+        }
+    }
 
     //If you collide with a puzzle set it to true etc
-    void OnTriggerStay(Collider activator)
+    void OnTriggerStay(Collider col)
     {
         //Debug.Log(activator.name);
 
-        if (activator.tag == "CubePuzzle")
+        if (col.tag == "CubePuzzle")
         {
             // Debug.Log("ITS PUZZLE TIME BOYZ");
-            transform.parent.GetComponent<RotationController>().isTouchingPuzzle = true;
-            transform.parent.GetComponent<RotationController>().currentPuzzle = activator.transform.root.gameObject;
+            //transform.parent.GetComponent<RotationController>().isTouchingPuzzle = true;
+            transform.parent.GetComponent<RotationController>().currentPuzzle = col.transform.root.gameObject;
         }
+    }
 
+    void OnTriggerExit(Collider col)
+    {
+        if (col.CompareTag("Interactable"))
+        {
+            selected = null;
+            RemoveHighlight(col.transform);
+        }
     }
 }
