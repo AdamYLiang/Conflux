@@ -67,9 +67,12 @@
 		#pragma shader_feature _GLOWCOLOR
 
 		sampler2D _MainTex;
+		sampler2D _BumpMap;
 
 		struct Input {
 			float2 uv_MainTex;
+			float2 uv_BumpMap;
+			float3 worldPos;
 		};
 
 		half _Glossiness;
@@ -88,15 +91,16 @@
 		if (avg > 0.5) {
 			color = 0.5;
 		}
-
+		
 		if (avg < 0.25)
 		{
-			color = _Color * sin((IN.uv_MainTex.x / (IN.uv_MainTex.y/10)) * 5 + _Time[1] * 4);
+			color = _Color * sin((IN.worldPos.x * 5 / (IN.worldPos.y * 5)) * 5 + _Time[1] * 4);
 		}
 
 
 		o.Albedo = color;
 		// Metallic and smoothness come from slider variables
+		o.Normal = UnpackNormal(tex2D(_BumpMap, IN.uv_MainTex));
 		o.Metallic = _Metallic;
 		o.Smoothness = _Glossiness;
 		o.Alpha = c.a;

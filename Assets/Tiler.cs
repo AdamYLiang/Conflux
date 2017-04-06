@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 //Note: Modified and updated version of:
-//          http://ericeastwood.com/blog/20/texture-tiling-based-on-object-sizescale-in-unity
+//      http://ericeastwood.com/blog/20/texture-tiling-based-on-object-sizescale-in-unity
 
 //Only run in edit mode.
 [ExecuteInEditMode]
@@ -80,10 +80,13 @@ public class Tiler : MonoBehaviour {
 
         //Calculate the texture-to-mesh width based on the ratio given by user-set texture-to-mesh height.
         float textureToMeshX = ((float)texture.width / texture.height) * textureToMeshZ;
+        Vector2 targetScale = new Vector2(planeSizeX * gameObject.transform.lossyScale.x / textureToMeshZ,
+                planeSizeZ * gameObject.transform.lossyScale.z / textureToMeshZ);
 
         //Set the values.
-        gameObject.GetComponent<Renderer>().material.mainTextureScale =
-            new Vector2(planeSizeX * gameObject.transform.lossyScale.x / textureToMeshZ,   
-                planeSizeZ * gameObject.transform.lossyScale.z / textureToMeshZ);
+        gameObject.GetComponent<Renderer>().material.mainTextureScale = targetScale;
+
+
+        //gameObject.GetComponent<Renderer>().material.SetTextureScale("NormalMap", targetScale);
     }
 }
