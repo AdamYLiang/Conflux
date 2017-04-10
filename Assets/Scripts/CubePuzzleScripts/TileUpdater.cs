@@ -27,7 +27,8 @@ public class TileUpdater : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        puzzleManager = transform.root.GetComponent<PuzzleManager>();
+        //puzzleManager = transform.root.GetComponent<PuzzleManager>();
+		puzzleManager = transform.parent.parent.GetComponent<PuzzleManager>(); //have to account for new hierarchy
         if (puzzleManager.editor)
         {
             puzzleEditor = transform.root.GetComponent<CubeSpawner>();
