@@ -26,6 +26,9 @@ public class Tiler : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+
+		Debug.Log("Tiler is on, please turn off");
+
         mat = GetComponent<Renderer>().material;
 
         texture = mat.mainTexture;
