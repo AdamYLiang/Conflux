@@ -44,7 +44,7 @@ public class DrawFromController : MonoBehaviour {
             if(col.gameObject.transform.parent.name.Contains("Emitter"))
             {
                 //Press a key and set our new draw origin to here.
-                if (mainController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) && col.gameObject.transform.root.GetComponent<PuzzleManager>().play)
+				if (mainController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
                 {
                     //Rumble
                     StartCoroutine(RumbleController(durationOfRumble, powerOfRumble));
