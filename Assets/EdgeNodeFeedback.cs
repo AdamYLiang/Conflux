@@ -2,43 +2,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NodeFeedback : MonoBehaviour {
+public class EdgeNodeFeedback : MonoBehaviour {
 
     public float detectRange = 5, maxSize;
-
-    public bool print = false;
 
     public GameObject controller1, controller2;
     public float growTime = 1f;
 
     protected GameObject gameManager;
 
-    public Color closeColor;
-    protected Color originalColor;
-
-    protected bool onColor = false;
     protected Vector3 originalScale;
 
-    protected float colorStep = 0f;
-    protected Material ourMat;
 
-	// Use this for initialization
-	void Start ()
-    {
+    // Use this for initialization
+    void Start () {
         gameManager = GameObject.Find("GameManager");
 
         controller1 = gameManager.GetComponent<GameManager>().controller1;
         controller2 = gameManager.GetComponent<GameManager>().controller2;
 
-        originalScale = transform.GetChild(0).localScale;
-        ourMat = transform.GetChild(0).GetComponent<Renderer>().material;
-	}
+        originalScale = transform.localScale;
+
+    }
 	
 	// Update is called once per frame
-	void Update ()
-    {
+	void Update () {
         controller1 = gameManager.GetComponent<GameManager>().controller1;
         controller2 = gameManager.GetComponent<GameManager>().controller2;
+
         if (controller1 != null && controller2 != null)
         {
             //Calculate the distance from controller to node
@@ -63,40 +54,23 @@ public class NodeFeedback : MonoBehaviour {
             if (detectRange > chosen)
             {
                 //Render it
-                transform.GetChild(0).GetComponent<Renderer>().enabled = true;
+                transform.GetComponent<Renderer>().enabled = true;
 
                 //DetectRange - chosen will be greater the smaller chosen is, i.e. closer to the node
                 //Thus, with a detect range of 5, and a chosen distance of 3, our scale modifier will be 0.4f.
                 //At a range of 5 with chosen distance of 1, our scale modifeier will be 0.8f;
                 //Note: Issues because we are dividing decimals, which actually makes it bigger.
-                scaling = ((detectRange - chosen)/detectRange) * maxSize;
-                if (print)
+                scaling = ((detectRange - chosen) / detectRange) * maxSize;
+                if (scaling < 0f)
                 {
-                    Debug.Log("scaling: " + scaling);
+                    scaling = 0;
                 }
-                if(scaling < 0f)
-                {
-                    scaling = 0;  
-                }
-                onColor = true;
             }
             else
             {
-                transform.GetChild(0).GetComponent<Renderer>().enabled = false;
-                onColor = false;
+                transform.GetComponent<Renderer>().enabled = false;
             }
-
-            if (onColor)
-            {
-                colorStep = Mathf.Clamp01(colorStep + Time.deltaTime * 2);
-            }
-            else
-            {
-                colorStep = Mathf.Clamp01(colorStep - Time.deltaTime * 2);
-            }
-
-            ourMat.color = Color.Lerp(originalColor, closeColor, colorStep);
-            transform.GetChild(0).localScale = originalScale * scaling;
+            transform.localScale = originalScale * scaling;
         }
     }
 }
