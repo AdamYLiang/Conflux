@@ -11,8 +11,10 @@ public class ReceiverScript : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-        indexOnList = transform.root.GetComponent<PuzzleManager>().receiverCompletion.Count;
-        transform.root.GetComponent<PuzzleManager>().receiverCompletion.Add(false);
+        //indexOnList = transform.root.GetComponent<PuzzleManager>().receiverCompletion.Count;
+		indexOnList = transform.parent.parent.parent.GetComponent<PuzzleManager>().receiverCompletion.Count;
+        //transform.root.GetComponent<PuzzleManager>().receiverCompletion.Add(false);
+		transform.parent.parent.parent.GetComponent<PuzzleManager>().receiverCompletion.Add(false);
         info = transform.parent.GetComponent<ConnectedInfo>();
         manager = transform.root.GetComponent<PuzzleManager>();
 
@@ -25,12 +27,14 @@ public class ReceiverScript : MonoBehaviour {
 
         if (complete)
         {
-            transform.root.GetComponent<PuzzleManager>().receiverCompletion[indexOnList] = true;
+            //transform.root.GetComponent<PuzzleManager>().receiverCompletion[indexOnList] = true;
+			transform.parent.parent.parent.GetComponent<PuzzleManager>().receiverCompletion[indexOnList] = true;
             transform.FindChild("Crystal_Emitter:pCylinder3").GetComponent<Renderer>().material.color = info.receivedRGBColor;
         }
         else
         {
-            transform.root.GetComponent<PuzzleManager>().receiverCompletion[indexOnList] = false;
+            //transform.root.GetComponent<PuzzleManager>().receiverCompletion[indexOnList] = false;
+			transform.parent.parent.parent.GetComponent<PuzzleManager>().receiverCompletion[indexOnList] = false;
             transform.FindChild("Crystal_Emitter:pCylinder3").GetComponent<Renderer>().material.color = info.incompleteRGBColor;
         }
        

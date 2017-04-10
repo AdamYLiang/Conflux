@@ -13,7 +13,8 @@ public class ConnectedInfo : MonoBehaviour {
     private PuzzleManager manager;
     // Use this for initialization
     void Start () {
-        manager = transform.root.GetComponent<PuzzleManager>();
+        //manager = transform.root.GetComponent<PuzzleManager>();
+		manager = transform.parent.parent.GetComponent<PuzzleManager>(); //have to account for new hierarchy
         if(laserFilter != EmitterScript.LaserColor.None)
         {
             incompleteRGBColor = manager.GetLaserPigment(laserFilter);

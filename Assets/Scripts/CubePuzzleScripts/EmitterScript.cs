@@ -36,7 +36,8 @@ public class EmitterScript : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        manager = transform.root.GetComponent<PuzzleManager>();
+        //manager = transform.root.GetComponent<PuzzleManager>();
+		manager = transform.parent.parent.GetComponent<PuzzleManager>(); //have to account for new hierarchy
         puzzleScale = transform.root.lossyScale.x;
         lr = transform.FindChild("LaserRenderer").GetComponent<LineRenderer>();
         lr.GetComponent<LineRenderer>().startWidth *= puzzleScale;
