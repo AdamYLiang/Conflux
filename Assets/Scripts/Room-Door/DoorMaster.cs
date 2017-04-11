@@ -21,6 +21,8 @@ public class DoorMaster : MonoBehaviour {
     public GameObject Room2; //ending room
     protected bool usedRoom = false; //When set to true, will flip which rooms to set active and inactive
 
+    public bool[] lights;
+
     void Update()
     {
 
