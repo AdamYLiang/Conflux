@@ -45,7 +45,7 @@ public class DrawFromController : MonoBehaviour {
             {
                 //Press a key and set our new draw origin to here.
 				if (mainController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) && 
-					col.gameObject.transform.root.GetComponent<PuzzleManager>().play)
+					col.gameObject.transform.parent.parent.parent.GetComponent<PuzzleManager>().play)
                 {
                     //Rumble
                     StartCoroutine(RumbleController(durationOfRumble, powerOfRumble));
@@ -56,13 +56,34 @@ public class DrawFromController : MonoBehaviour {
                 }
               
             }
+        } //If we are trying to draw from the end of the line
+        else if (col.gameObject.name.Contains("DrawingNode"))
+        {
+            //If we are not currently drawing
+            if (emitter == null)
+            {
+                if(mainController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) &&
+                    col.gameObject.GetComponent<DrawNodeInfo>().pm.play)
+                {
+                    //Rumble
+                    StartCoroutine(RumbleController(durationOfRumble, powerOfRumble));
+
+                    transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+                    emitter = col.gameObject.transform.parent.gameObject;
+                    emitter.GetComponent<EmitterScript>().StartDraw(gameObject);
+                    
+                }
+            }
         }
     }
 
     void OnTriggerEnter(Collider col)
     {
-        //Found a connection node.
-        if(col.gameObject.name.Contains("ConnectionNode"))
+
+      
+
+            //Found a connection node.
+        if (col.gameObject.name.Contains("ConnectionNode"))
         {
             //If we are currently drawing
             if(emitter != null)
@@ -83,6 +104,7 @@ public class DrawFromController : MonoBehaviour {
                 }//New node, attempt to add it, ONLY if it isn't already connected.
                 else if (col.GetComponent<ConnectionNOde>() != null)
                 {
+                    Debug.Log("Attempt to connect");
                     if (!col.GetComponent<ConnectionNOde>().connected)
                     {
                         Vector3 position = col.transform.parent.position;
@@ -97,6 +119,7 @@ public class DrawFromController : MonoBehaviour {
                 }//New node and edge connection
                 else if (col.transform.parent.name == "EdgeConnections")
                 {
+                    Debug.Log("Edge");
                     Vector3 position = col.transform.position;
                     bool shouldPulse = emitter.GetComponent<EmitterScript>().AddLineNode(col.gameObject);
                     //Debug.Log("pulse + " + shouldPulse);
@@ -132,6 +155,7 @@ public class DrawFromController : MonoBehaviour {
                 }
             }
         }
+       
     }
 
     //Coroutine to rumble controller, takes the power and the duration and then lerps it while changing the pulse 

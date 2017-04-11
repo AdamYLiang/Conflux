@@ -12,6 +12,7 @@ public class EmitterScript : MonoBehaviour {
     private Color laserPigment;
     float verticalAdjust = 0.5f;
 
+    public GameObject drawNode;
     public GameObject simulatedController;
     public GameObject emitter;
     GameObject receiver = null;
@@ -147,6 +148,12 @@ public class EmitterScript : MonoBehaviour {
             if(i != linePositions.Count - 1)
             {
                 lrPositions[i] += node.transform.up * heightFactor * puzzleScale;
+
+                //If this is the last real drawn node, move the draw node to there.
+                if (i == linePositions.Count - 2)
+                {
+                    drawNode.transform.localPosition = lrPositions[i];
+                }
             }
             // This should only happen when we're not drawing.
             if (i == linePositions.Count - 1 && !drawing)
@@ -154,8 +161,10 @@ public class EmitterScript : MonoBehaviour {
                 lrPositions[i] += node.transform.up * heightFactor * puzzleScale;
             }
 
-            lrPositions[i] = emitter.transform.InverseTransformPoint(lrPositions[i]);
+           
 
+            lrPositions[i] = emitter.transform.InverseTransformPoint(lrPositions[i]);
+           
             i++;
         }
 
@@ -206,6 +215,7 @@ public class EmitterScript : MonoBehaviour {
 
             //Add a Vector. It doesn't matter what value it is since the top level of the list is always connectede to the controller.
             linePositions.Add(node);
+
             //Set the vector before as the target position.
             linePositions[linePositions.Count - 2] = node;
             setConnection(node, true);
@@ -300,15 +310,16 @@ public class EmitterScript : MonoBehaviour {
         Vector3 difference = lastPosition - node.transform.position;
         float distance = difference.magnitude;
         //distance = Mathf.Round(distance);
-
+        
         if (distance < 0.95 * puzzleScale || distance > 1.05 * puzzleScale)
         {
-            //Vertex node
-            if(distance > 0.45 * puzzleScale && distance < 0.55 * puzzleScale)
+            //If the node is an edge connection 
+            if(node.transform.parent.name != connectedObjects[connectedObjects.Count - 2].transform.name && distance < puzzleScale)
+            //if(distance > 0.45 * puzzleScale && distance < 0.55 * puzzleScale)
             {
                 return true;
             }
-           //Debug.Log(distance + " " + difference);
+           Debug.Log(distance + " " + difference);
            return false;
         }
         return true;
