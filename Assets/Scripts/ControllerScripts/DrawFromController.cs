@@ -79,10 +79,7 @@ public class DrawFromController : MonoBehaviour {
 
     void OnTriggerEnter(Collider col)
     {
-
-      
-
-            //Found a connection node.
+        //Found a connection node.
         if (col.gameObject.name.Contains("ConnectionNode"))
         {
             //If we are currently drawing
@@ -99,6 +96,14 @@ public class DrawFromController : MonoBehaviour {
                         {
                             //Remove it from the list.
                             emitter.GetComponent<EmitterScript>().RemoveLineNode(col.gameObject);
+                            if(col.gameObject.GetComponent<NodeFeedback>() != null)
+                            {
+                                col.gameObject.GetComponent<NodeFeedback>().react = true;
+                            }
+                            if(col.gameObject.GetComponent<EdgeNodeFeedback>() != null)
+                            {
+                                col.gameObject.GetComponent<EdgeNodeFeedback>().react = true;
+                            }
                         }   
                     }
                 }//New node, attempt to add it, ONLY if it isn't already connected.
@@ -114,6 +119,14 @@ public class DrawFromController : MonoBehaviour {
                         {
                             //Rumble on connects
                              StartCoroutine(RumbleController(durationOfRumble, powerOfRumble));
+                            if (col.gameObject.GetComponent<NodeFeedback>() != null)
+                            {
+                                col.gameObject.GetComponent<NodeFeedback>().react = false;
+                            }
+                            if (col.gameObject.GetComponent<EdgeNodeFeedback>() != null)
+                            {
+                                col.gameObject.GetComponent<EdgeNodeFeedback>().react = false;
+                            }
                         }
                     }
                 }//New node and edge connection
@@ -127,6 +140,10 @@ public class DrawFromController : MonoBehaviour {
                     {
                         //Rumble on connects
                         StartCoroutine(RumbleController(durationOfRumble, powerOfRumble));
+                        if (col.gameObject.GetComponent<EdgeNodeFeedback>() != null)
+                        {
+                            col.gameObject.GetComponent<EdgeNodeFeedback>().react = true;
+                        }
                     }
                 }
                 else if (col.transform.parent.name.Contains("Receiver"))
