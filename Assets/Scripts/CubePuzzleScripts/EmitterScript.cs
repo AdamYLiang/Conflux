@@ -32,6 +32,8 @@ public class EmitterScript : MonoBehaviour {
     private float heightFactor = 0.33f, puzzleScale = 1.0f;
     private PuzzleManager manager;
 
+    Vector3 scale = new Vector3(1f, .25f, 1f);
+
     //The particle system
     public GameObject pSystem;
 
@@ -43,7 +45,7 @@ public class EmitterScript : MonoBehaviour {
         lr = transform.FindChild("LaserRenderer").GetComponent<LineRenderer>();
         lr.GetComponent<LineRenderer>().startWidth *= puzzleScale;
         lr.GetComponent<LineRenderer>().endWidth *= puzzleScale;
-
+        transform.localScale = scale;
         laserOriginCoordinate = GetComponent<TileUpdater>().cubeCoordinate;
 
         //Initialize the emitter.
