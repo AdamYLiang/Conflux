@@ -8,9 +8,12 @@ public class ReceiverScript : MonoBehaviour {
     private ConnectedInfo info;
     private bool complete = false;
     private int indexOnList = -1;
+
+    Vector3 scale = new Vector3(0.6f, 0.15f, 0.6f);
+
 	// Use this for initialization
 	void Start () {
-
+        transform.parent.localScale = scale;
         //indexOnList = transform.root.GetComponent<PuzzleManager>().receiverCompletion.Count;
 		indexOnList = transform.parent.parent.parent.GetComponent<PuzzleManager>().receiverCompletion.Count;
         //transform.root.GetComponent<PuzzleManager>().receiverCompletion.Add(false);
