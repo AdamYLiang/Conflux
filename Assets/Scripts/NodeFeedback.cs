@@ -7,6 +7,7 @@ public class NodeFeedback : MonoBehaviour {
     public float detectRange = 5, maxSize;
 
     public bool print = false;
+    public bool react = true;
 
     public GameObject controller1, controller2;
     public float growTime = 1f;
@@ -39,7 +40,7 @@ public class NodeFeedback : MonoBehaviour {
     {
         controller1 = gameManager.GetComponent<GameManager>().controller1;
         controller2 = gameManager.GetComponent<GameManager>().controller2;
-        if (controller1 != null && controller2 != null)
+        if (controller1 != null && controller2 != null && react)
         {
             //Calculate the distance from controller to node
             float distance = (controller1.transform.position - transform.position).magnitude;
@@ -69,7 +70,12 @@ public class NodeFeedback : MonoBehaviour {
                 //Thus, with a detect range of 5, and a chosen distance of 3, our scale modifier will be 0.4f.
                 //At a range of 5 with chosen distance of 1, our scale modifeier will be 0.8f;
                 //Note: Issues because we are dividing decimals, which actually makes it bigger.
-                scaling = ((detectRange - chosen)/detectRange) * maxSize;
+                scaling = ((detectRange - chosen) / detectRange) * maxSize;
+                scaling = Mathf.Min(scaling, 2f);
+                if (scaling < 0f)
+                {
+                    scaling = 0;
+                }
                 if (print)
                 {
                     Debug.Log("scaling: " + scaling);
@@ -82,7 +88,8 @@ public class NodeFeedback : MonoBehaviour {
             }
             else
             {
-                transform.GetChild(0).GetComponent<Renderer>().enabled = false;
+                //transform.GetChild(0).GetComponent<Renderer>().enabled = false;
+                scaling = 0.2f;
                 onColor = false;
             }
 
@@ -98,5 +105,15 @@ public class NodeFeedback : MonoBehaviour {
             ourMat.color = Color.Lerp(originalColor, closeColor, colorStep);
             transform.GetChild(0).localScale = originalScale * scaling;
         }
+        else if(!react)
+        {
+            TurnOn();
+        }
+    }
+
+    public void TurnOn()
+    {
+        ourMat.color = closeColor;
+        transform.GetChild(0).localScale = originalScale * 2.5f;
     }
 }
