@@ -23,6 +23,15 @@ public class DoorMaster : MonoBehaviour {
 
     public bool[] lights;
 
+    void Start()
+    {
+        
+        if (!locked)
+        {
+            door[0].GetComponent<AirlockAnimationController>().OpenDoor();
+        }
+    }
+
     void Update()
     {
 
@@ -46,17 +55,9 @@ public class DoorMaster : MonoBehaviour {
 			//this.gameObject.SetActive(false);
 		}
 
-        /*
-        //If the puzzle to unlock the door exists
-        if (puzzleUnlocker != null)
-        {
-            //If the puzzle is finished then unlock the door 
-            if (puzzleUnlocker.GetComponent<PuzzleManager>().finished)
-            {
-                locked = false;
-            }
-        }*/
-        
+        if (Input.GetKeyDown(KeyCode.Space)){
+            SetLock(!locked);
+        }
     }
 
 	void RoomTurnOff(){
@@ -100,7 +101,6 @@ public class DoorMaster : MonoBehaviour {
 
     public void openNextDoor()
     {
-
         if (usedRoom)
         {
             Room1.SetActive(true);
