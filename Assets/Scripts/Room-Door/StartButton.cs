@@ -95,6 +95,7 @@ public class StartButton : MonoBehaviour {
         if (col.transform.root.transform.name == "[CameraRig]")
         {
             thePlayerRig = col.transform.root.gameObject;
+			this.transform.parent.GetComponent<DoorMaster>().isPlayerIn = true; //Says player is inside to prevent door delete
             entered = true;
         }
     }
@@ -104,11 +105,13 @@ public class StartButton : MonoBehaviour {
     {
         if (col.transform.root.transform.name == "[CameraRig]")
         {
-            thePlayerRig = null;
+			//Resets the player to be not inside if they leave
+			this.transform.parent.GetComponent<DoorMaster>().isPlayerIn = false;
             if (thePlayerRig != null)
             {
                 thePlayerRig.transform.SetParent(null);
             }
+			thePlayerRig = null;
             entered = false;
         }
         //If we aren't firing once reset the correct bools.

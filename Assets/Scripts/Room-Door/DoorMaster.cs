@@ -14,6 +14,7 @@ public class DoorMaster : MonoBehaviour {
     private bool lockedChanged= false;
 	public bool finishedRotating = false;
     public GameObject puzzleUnlocker; //The puzzle that unlocks said door
+	public bool isPlayerIn = false; //Shows if player is inside
 
     //Assumes 1 door can only go between 2 rooms, assign both doors and then set them inactive when rotating
     //Assign each manually in inspector 
@@ -23,14 +24,14 @@ public class DoorMaster : MonoBehaviour {
 
     public bool[] lights;
 
-    void Start()
-    {
-        
-        if (!locked)
-        {
-            door[0].GetComponent<AirlockAnimationController>().OpenDoor();
-        }
-    }
+	void Start(){
+
+		//Only does 1st door in list
+		if(!locked){
+			door[0].GetComponent<AirlockAnimationController>().OpenDoor();
+		}
+
+	}
 
     void Update()
     {
@@ -47,17 +48,26 @@ public class DoorMaster : MonoBehaviour {
         }
 
 		//If both adjacent rooms are inactive, then set this door inactive, also resets the forloop so that it can turn on doors
-		//Invokes after 10 seconds, rn its hard coded so player wont be deleted mid rotate
-		if(!Room1.activeSelf && !Room2.activeSelf){
+		//Only activates if the player is not inside
+		if(!Room1.activeSelf && !Room2.activeSelf && !isPlayerIn){
 			Room1.GetComponent<RoomInfo>().doorsOpen = false;
 			Room2.GetComponent<RoomInfo>().doorsOpen = false;
-			Invoke("RoomTurnOff", 10f);
+			RoomTurnOff();
+			//Invoke("RoomTurnOff", 15f);
 			//this.gameObject.SetActive(false);
 		}
 
-        if (Input.GetKeyDown(KeyCode.Space)){
-            SetLock(!locked);
-        }
+        /*
+        //If the puzzle to unlock the door exists
+        if (puzzleUnlocker != null)
+        {
+            //If the puzzle is finished then unlock the door 
+            if (puzzleUnlocker.GetComponent<PuzzleManager>().finished)
+            {
+                locked = false;
+            }
+        }*/
+        
     }
 
 	void RoomTurnOff(){
@@ -101,6 +111,7 @@ public class DoorMaster : MonoBehaviour {
 
     public void openNextDoor()
     {
+
         if (usedRoom)
         {
             Room1.SetActive(true);
