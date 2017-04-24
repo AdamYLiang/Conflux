@@ -9,6 +9,8 @@ public class NodeFeedback : MonoBehaviour {
     public bool print = false;
     public bool react = true;
 
+    //The object that we will measure distance to.
+    public GameObject sensorObject;
     public GameObject controller1, controller2;
     public float growTime = 1f;
 
@@ -38,15 +40,36 @@ public class NodeFeedback : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        controller1 = gameManager.GetComponent<GameManager>().controller1;
-        controller2 = gameManager.GetComponent<GameManager>().controller2;
+        //controller1 = gameManager.GetComponent<GameManager>().controller1;
+        //controller2 = gameManager.GetComponent<GameManager>().controller2;
+        //Old if statement. Now used to get the sensorObject.
         if (controller1 != null && controller2 != null && react)
         {
+            if(controller1 != null)
+            {
+                if(controller1.transform.GetChild(1).GetComponent<DrawFromController>() != null)
+                {
+                    sensorObject = controller1.transform.GetChild(1).GetComponent<DrawFromController>().emitter;
+                }
+            }
+            if (controller2 != null)
+            {
+                if (controller2.transform.GetChild(1).GetComponent<DrawFromController>() != null)
+                {
+                    sensorObject = controller2.transform.GetChild(1).GetComponent<DrawFromController>().emitter;
+                }
+            }
+        }
+        if(react && sensorObject != null)
+        {
             //Calculate the distance from controller to node
-            float distance = (controller1.transform.position - transform.position).magnitude;
-            float distance2 = (controller2.transform.position - transform.position).magnitude;
+            //float distance = (controller1.transform.position - transform.position).magnitude;
+            //float distance2 = (controller2.transform.position - transform.position).magnitude;
+            float distance = (sensorObject.transform.position - transform.position).magnitude;
+            float chosen = distance;
 
             //Pick the smallest distance to use as our measurement. i.e. we want the closest controller to affect our size
+            /*
             float chosen = 0;
             if (distance > distance2)
             {
@@ -55,7 +78,7 @@ public class NodeFeedback : MonoBehaviour {
             else // Instead of checking for less than, just an else is fine. If it is equal it won't matter which one we pick anyway.
             {
                 chosen = distance;
-            }
+            }*/
 
             //Default 1 will keep it the normal size. We want hte min to be 1, and the max to be maxSize.
             //We want it to scale bigger the closer it gets to 0. Our max range of default scaling should be detectRange
@@ -76,10 +99,7 @@ public class NodeFeedback : MonoBehaviour {
                 {
                     scaling = 0;
                 }
-                if (print)
-                {
-                    Debug.Log("scaling: " + scaling);
-                }
+               
                 if(scaling < 0f)
                 {
                     scaling = 0;  
