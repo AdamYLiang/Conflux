@@ -30,4 +30,14 @@ public class AllHexLightsController : MonoBehaviour {
             }
         }
     }
+
+    public void TurnOn(int index)
+    {
+        lightsOn[index] = true;
+    }
+
+    public void TurnOff(int index)
+    {
+        lightsOn[index] = false;
+    }
 }

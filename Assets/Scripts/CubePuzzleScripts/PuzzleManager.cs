@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 public class PuzzleManager : MonoBehaviour {
 
-
+    public GameObject lightRack;
     public List<bool> receiverCompletion;
     public bool play = false;
     public bool finished = false;
@@ -18,6 +18,7 @@ public class PuzzleManager : MonoBehaviour {
     public MeshRenderer targetRenderer;
     Vector3 randomRotation = new Vector3(1, 1, 1);
     public UnityEvent OnPuzzleComplete = new UnityEvent();
+    
 
     private bool allActive = true;
     private Light glow;
@@ -39,9 +40,6 @@ public class PuzzleManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-
-
-
         if (hidden)
         {
             HideCube();
@@ -105,13 +103,6 @@ public class PuzzleManager : MonoBehaviour {
                 randomRotation.z = Mathf.Clamp(randomRotation.z + Random.Range(0, 10f), -20, 20f);
                 transform.Rotate(randomRotation * Time.deltaTime);
             }
-            /*
-
-            if (!play && !editor)
-            {
-                transform.Rotate(new Vector3(Random.Range(10, 20), Random.Range(10, 20), Random.Range(10, 20)) * Time.deltaTime);
-                //transform.rotation = Quaternion.Euler(transform.eulerAngles + (new Vector3(20, 5, 0) * Time.deltaTime));
-            }*/
         }
 
         if (!finishInvoked && finished)
@@ -269,6 +260,14 @@ public class PuzzleManager : MonoBehaviour {
         receiverCompletion = new List<bool>();
     }
 
+    public void TurnOn(int index)
+    {
+        lightRack.GetComponent<AllHexLightsController>().TurnOn(index);
+    }
 
+    public void TurnOff(int index)
+    {
+        lightRack.GetComponent<AllHexLightsController>().TurnOff(index);
+    }
 
 }

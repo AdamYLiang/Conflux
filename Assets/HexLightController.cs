@@ -48,9 +48,10 @@ public class HexLightController : MonoBehaviour {
     {
         float step = 0f;
        
-        while(mat.GetColor("_EmissionColor").grayscale < originalEmissionColor.grayscale * lightRange)
+        while(step < 1f)
         {
-            float factor = Mathf.Lerp(0, lightRange, step);
+            Debug.Log(step);
+            float factor = Mathf.Lerp(-lightRange, lightRange, step);
             mat.SetColor("_EmissionColor", originalEmissionColor * factor);
             //mat.SetFloat("EmissionScaleUI", Mathf.Lerp(0, lightRange, step));
             step += Time.deltaTime;
@@ -62,7 +63,7 @@ public class HexLightController : MonoBehaviour {
     {
         float step = 0f;
 
-        while(mat.GetColor("_EmissionColor").grayscale > 0)
+        while(step < 1f)
         {
             float factor = Mathf.Lerp(lightRange, 0, step);
             mat.SetColor("_EmissionColor", originalEmissionColor * factor);

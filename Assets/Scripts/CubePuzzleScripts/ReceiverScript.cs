@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class ReceiverScript : MonoBehaviour {
 
@@ -8,6 +9,9 @@ public class ReceiverScript : MonoBehaviour {
     private ConnectedInfo info;
     private bool complete = false;
     private int indexOnList = -1;
+
+    public UnityEvent OnComplete = new UnityEvent();
+    public UnityEvent OnIncomplete = new UnityEvent();
 
     Vector3 scale = new Vector3(0.6f, 0.15f, 0.6f);
 
@@ -33,12 +37,14 @@ public class ReceiverScript : MonoBehaviour {
             //transform.root.GetComponent<PuzzleManager>().receiverCompletion[indexOnList] = true;
 			transform.parent.parent.parent.GetComponent<PuzzleManager>().receiverCompletion[indexOnList] = true;
             transform.FindChild("Crystal_Emitter:pCylinder3").GetComponent<Renderer>().material.color = info.receivedRGBColor;
+            OnComplete.Invoke();
         }
         else
         {
             //transform.root.GetComponent<PuzzleManager>().receiverCompletion[indexOnList] = false;
 			transform.parent.parent.parent.GetComponent<PuzzleManager>().receiverCompletion[indexOnList] = false;
             transform.FindChild("Crystal_Emitter:pCylinder3").GetComponent<Renderer>().material.color = info.incompleteRGBColor;
+            OnIncomplete.Invoke();
         }
        
 	}
