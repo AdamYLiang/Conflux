@@ -23,8 +23,13 @@ public class ControllerColDetect : MonoBehaviour
         if (mainController.GetPressUp(SteamVR_Controller.ButtonMask.Trigger))
         {
             transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-            
+            if(GetComponent<SpringJoint>() != null)
+            {
+                Destroy(GetComponent<SpringJoint>());
+            }
         }
+
+
         /*
        //If the selected obj is not the one that is highlighted, we have a new selected.
        if(selected != highlighted)
@@ -91,9 +96,11 @@ public class ControllerColDetect : MonoBehaviour
         else if (col.name == "Interactable")
         {
             //If we press down pick up the interactable object.
-            if (mainController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
+            if (mainController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) || Input.GetKeyDown(KeyCode.A))
             {
-                 
+                SpringJoint joint = gameObject.AddComponent<SpringJoint>();
+                col.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+                joint.connectedBody = col.gameObject.GetComponent<Rigidbody>();
             }
         }
     }
