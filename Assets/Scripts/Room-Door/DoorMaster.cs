@@ -22,6 +22,10 @@ public class DoorMaster : MonoBehaviour {
     public GameObject Room2; //ending room
     protected bool usedRoom = false; //When set to true, will flip which rooms to set active and inactive
 
+	public int TotalLocks;
+	public int currentLocks = 0;
+	public bool isCompleted = false;
+
     public bool[] lights;
 
 	void Start(){
@@ -67,7 +71,11 @@ public class DoorMaster : MonoBehaviour {
                 locked = false;
             }
         }*/
-        
+		if(currentLocks == TotalLocks){
+			//Close Door
+			isCompleted = true;
+			//GetComponent<AirlockAnimationController>().CloseDoorIgnoreEvent();
+		}
     }
 
 	void RoomTurnOff(){
@@ -108,6 +116,10 @@ public class DoorMaster : MonoBehaviour {
         locked = state;
         lockedChanged = true;
     }
+
+	public void CompletedOneLock(){
+		currentLocks++;
+	}
 
     public void openNextDoor()
     {

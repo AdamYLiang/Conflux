@@ -117,8 +117,8 @@ public class PuzzleManager : MonoBehaviour {
         {
             if(lerpTimer <= 1.5f)
             {
-                lerpTimer += Time.deltaTime / 3f;
-                this.transform.position = Vector3.Lerp(transform.position, new Vector3(0, -1, 0), lerpTimer);
+                lerpTimer += Time.deltaTime * 2f;
+				this.transform.position = Vector3.Lerp(this.transform.position, new Vector3(this.transform.position.x, -1, this.transform.position.z), lerpTimer);
             }
         }
 
