@@ -7,7 +7,44 @@ public class ControllerColDetect : MonoBehaviour
     public GameObject selected = null;
     private GameObject highlighted = null;
 
+    public SteamVR_Controller.Device mainController;
+    public SteamVR_TrackedObject trackedObj;
+
     public Material oldMat = null;
+
+    void Start()
+    {
+        trackedObj = transform.parent.GetComponent<SteamVR_TrackedObject>();
+    }
+
+    void Update()
+    {
+        mainController = SteamVR_Controller.Input((int)trackedObj.index);
+        if (mainController.GetPressUp(SteamVR_Controller.ButtonMask.Trigger))
+        {
+            transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+            
+        }
+        /*
+       //If the selected obj is not the one that is highlighted, we have a new selected.
+       if(selected != highlighted)
+       {
+           //If the highlighted wasn't null, we need to reset the old highlighted obj.
+           if(highlighted != null)
+           {
+               RemoveHighlight(highlighted.transform);
+           }
+
+           //If the selected obj isn't null, we need to apply the highlight.
+           if(selected != null)
+           {
+               ApplyHighlight(selected.transform);
+           }
+
+           //Regardless of what happened the highlighted object should now be the selected.
+           highlighted = selected;
+       }*/
+    }
 
     //Applies the shader to the transform.
     public void ApplyHighlight(Transform trans)
@@ -31,28 +68,6 @@ public class ControllerColDetect : MonoBehaviour
 
     }
 
-    void Update()
-    {
-        //If the selected obj is not the one that is highlighted, we have a new selected.
-        if(selected != highlighted)
-        {
-            //If the highlighted wasn't null, we need to reset the old highlighted obj.
-            if(highlighted != null)
-            {
-                RemoveHighlight(highlighted.transform);
-            }
-            
-            //If the selected obj isn't null, we need to apply the highlight.
-            if(selected != null)
-            {
-                ApplyHighlight(selected.transform);
-            }
-            
-            //Regardless of what happened the highlighted object should now be the selected.
-            highlighted = selected;
-        }
-    }
-
     void OnTriggerEnter(Collider col)
     {
         if (col.CompareTag("Interactable"))
@@ -71,6 +86,15 @@ public class ControllerColDetect : MonoBehaviour
             // Debug.Log("ITS PUZZLE TIME BOYZ");
             //transform.parent.GetComponent<RotationController>().isTouchingPuzzle = true;
             transform.parent.GetComponent<RotationController>().currentPuzzle = col.transform.root.gameObject;
+        }
+        //Found interactable object
+        else if (col.name == "Interactable")
+        {
+            //If we press down pick up the interactable object.
+            if (mainController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
+            {
+                 
+            }
         }
     }
 

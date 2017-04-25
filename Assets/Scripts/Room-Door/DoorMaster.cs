@@ -28,7 +28,7 @@ public class DoorMaster : MonoBehaviour {
 
 		//Only does 1st door in list
 		if(!locked){
-			door[0].GetComponent<AirlockAnimationController>().OpenDoor();
+		    GetComponent<AirlockAnimationController>().OpenDoor();
 		}
 
 	}
@@ -38,12 +38,12 @@ public class DoorMaster : MonoBehaviour {
 
         if (locked && lockedChanged)
         {
-            door[0].GetComponent<AirlockAnimationController>().CloseDoorIgnoreEvent();
+            GetComponent<AirlockAnimationController>().CloseDoorIgnoreEvent();
             lockedChanged = false;
         }
         else if (!locked && lockedChanged)
         {
-            door[0].GetComponent<AirlockAnimationController>().OpenDoorIgnoreEvent();
+            GetComponent<AirlockAnimationController>().OpenDoorIgnoreEvent();
             lockedChanged = false;
         }
 

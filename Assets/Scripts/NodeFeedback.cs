@@ -93,7 +93,7 @@ public class NodeFeedback : MonoBehaviour {
                 //Thus, with a detect range of 5, and a chosen distance of 3, our scale modifier will be 0.4f.
                 //At a range of 5 with chosen distance of 1, our scale modifeier will be 0.8f;
                 //Note: Issues because we are dividing decimals, which actually makes it bigger.
-                scaling = ((detectRange - chosen) / detectRange) * maxSize;
+                scaling = ((detectRange - chosen) / detectRange) * 3;
                 scaling = Mathf.Min(scaling, 2f);
                 if (scaling < 0f)
                 {

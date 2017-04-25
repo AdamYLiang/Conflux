@@ -27,6 +27,7 @@ public class RoomInfo : MonoBehaviour {
 		//If the room is active and the doors are not open
 		//Run a loop through all the doors and set them open, then say its open so it stops the loop
 		if(this.gameObject.activeSelf && !doorsOpen){
+            //Debug.Log(doors.Count);
 			for(int i = 0; i < doors.Count; i++){
 				doors[i].SetActive(true);
 			}
