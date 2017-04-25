@@ -7,7 +7,7 @@ public class PuzzleManager : MonoBehaviour {
 
     public GameObject lightRack;
     public List<bool> receiverCompletion;
-    public bool play = true;
+    public bool play = false;
     public bool finished = false;
     public bool editor = false;
     public enum PuzzleType { Cube, Wall, Other };
@@ -27,7 +27,8 @@ public class PuzzleManager : MonoBehaviour {
     private float colorChangeTimer = 0f; 
     private Transform playTiles;
     private Color targetColor, currentColor;
-	private float lerpTimer = 0f;
+
+    private float lerpTimer = 0f;
  
 
     void Start()
@@ -112,12 +113,14 @@ public class PuzzleManager : MonoBehaviour {
             finishInvoked = true;
         }
 
-		if(finished){
-			if(lerpTimer <= 1.5f){
-				lerpTimer += 0.03f;
-				this.transform.position = Vector3.Lerp(transform.position, new Vector3(0, -1, 0), lerpTimer);
-			}
-		}
+        if (finished)
+        {
+            if(lerpTimer <= 1.5f)
+            {
+                lerpTimer += Time.deltaTime * 2f;
+				this.transform.position = Vector3.Lerp(this.transform.position, new Vector3(this.transform.position.x, -1, this.transform.position.z), lerpTimer);
+            }
+        }
 
 	}
 

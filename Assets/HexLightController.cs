@@ -44,6 +44,16 @@ public class HexLightController : MonoBehaviour {
        
 	}
 
+    public void LightOn()
+    {
+        isOn = true;
+    }
+
+    public void Lighoff()
+    {
+        isOn = false;
+    }
+
     public IEnumerator TurnOn()
     {
         float step = 0f;
