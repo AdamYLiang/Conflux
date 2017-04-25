@@ -85,7 +85,7 @@ public class ControllerColDetect : MonoBehaviour
         {
             // Debug.Log("ITS PUZZLE TIME BOYZ");
             //transform.parent.GetComponent<RotationController>().isTouchingPuzzle = true;
-            transform.parent.GetComponent<RotationController>().currentPuzzle = col.transform.root.gameObject;
+            //transform.parent.GetComponent<RotationController>().currentPuzzle = col.transform.root.gameObject;
         }
         //Found interactable object
         else if (col.name == "Interactable")

@@ -23,7 +23,7 @@ public class ReceiverScript : MonoBehaviour {
         //transform.root.GetComponent<PuzzleManager>().receiverCompletion.Add(false);
 		transform.parent.parent.parent.GetComponent<PuzzleManager>().receiverCompletion.Add(false);
         info = transform.parent.GetComponent<ConnectedInfo>();
-        manager = transform.root.GetComponent<PuzzleManager>();
+        manager = transform.parent.parent.parent.GetComponent<PuzzleManager>();
 
 	}
 	

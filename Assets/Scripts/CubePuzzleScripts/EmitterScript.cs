@@ -41,7 +41,7 @@ public class EmitterScript : MonoBehaviour {
     void Start () {
         //manager = transform.root.GetComponent<PuzzleManager>();
 		manager = transform.parent.parent.GetComponent<PuzzleManager>(); //have to account for new hierarchy
-        puzzleScale = transform.root.lossyScale.x;
+        puzzleScale = manager.gameObject.transform.lossyScale.x;
         lr = transform.FindChild("LaserRenderer").GetComponent<LineRenderer>();
         lr.GetComponent<LineRenderer>().startWidth *= puzzleScale;
         lr.GetComponent<LineRenderer>().endWidth *= puzzleScale;
@@ -50,7 +50,7 @@ public class EmitterScript : MonoBehaviour {
 
         //Initialize the emitter.
       
-        puzzleScale = transform.root.lossyScale.x;
+        //puzzleScale = transform.root.lossyScale.x;
         SetLaserPigment(manager.GetLaserPigment(laserColor)/3);
     
 	}

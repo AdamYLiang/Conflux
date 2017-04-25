@@ -27,6 +27,8 @@ public class PuzzleManager : MonoBehaviour {
     private float colorChangeTimer = 0f; 
     private Transform playTiles;
     private Color targetColor, currentColor;
+
+    private float lerpTimer = 0f;
  
 
     void Start()
@@ -109,6 +111,15 @@ public class PuzzleManager : MonoBehaviour {
         {
             OnPuzzleComplete.Invoke();
             finishInvoked = true;
+        }
+
+        if (finished)
+        {
+            if(lerpTimer <= 1.5f)
+            {
+                lerpTimer += Time.deltaTime / 3f;
+                this.transform.position = Vector3.Lerp(transform.position, new Vector3(0, -1, 0), lerpTimer);
+            }
         }
 
 	}
