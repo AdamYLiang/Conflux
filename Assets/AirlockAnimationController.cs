@@ -27,7 +27,7 @@ public class AirlockAnimationController : MonoBehaviour {
 
     void Start()
     {
-        locked = transform.parent.GetComponent<DoorMaster>().locked;
+        locked = transform.GetComponent<DoorMaster>().locked;
         animator = GetComponent<Animator>();
         if(currentState == DoorState.Open)
         {
@@ -39,7 +39,7 @@ public class AirlockAnimationController : MonoBehaviour {
 
     void Update()
     {
-        locked = transform.parent.GetComponent<DoorMaster>().locked;
+        locked = transform.GetComponent<DoorMaster>().locked;
         stateInfo = animator.GetCurrentAnimatorStateInfo(0);
         //The normalized time represents how many complete loops of this animation has occured. Above 1 means it has completed.
         /*

@@ -37,6 +37,15 @@ public class DrawFromController : MonoBehaviour {
 
     void OnTriggerStay(Collider col)
     {
+		Debug.Log(col.gameObject.name);
+		if(col.gameObject.name.Contains("CompleteButton")){
+			GameObject tempDoor = col.gameObject.transform.parent.gameObject;
+			if(mainController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) &&
+				tempDoor.GetComponent<DoorMaster>().isCompleted){
+				tempDoor.GetComponent<AirlockAnimationController>().CloseDoorIgnoreEvent();
+			}
+		}
+
         //Found a connection node.
         if (col.name == "ConnectionNode")
         {
@@ -79,6 +88,7 @@ public class DrawFromController : MonoBehaviour {
 
     void OnTriggerEnter(Collider col)
     {
+
         //Found a connection node.
         if (col.gameObject.name.Contains("ConnectionNode"))
         {
