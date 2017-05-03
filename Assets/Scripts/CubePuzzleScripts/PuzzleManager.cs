@@ -18,7 +18,7 @@ public class PuzzleManager : MonoBehaviour {
     public MeshRenderer targetRenderer;
     Vector3 randomRotation = new Vector3(1, 1, 1);
     public UnityEvent OnPuzzleComplete = new UnityEvent();
-    
+    public GameObject keyCube;
 
     private bool allActive = true;
     private Light glow;
@@ -112,7 +112,7 @@ public class PuzzleManager : MonoBehaviour {
             OnPuzzleComplete.Invoke();
             finishInvoked = true;
         }
-
+        /*
         if (finished)
         {
             if(lerpTimer <= 1.5f)
@@ -120,7 +120,7 @@ public class PuzzleManager : MonoBehaviour {
                 lerpTimer += Time.deltaTime * 2f;
 				this.transform.position = Vector3.Lerp(this.transform.position, new Vector3(this.transform.position.x, -1, this.transform.position.z), lerpTimer);
             }
-        }
+        }*/
 
 	}
 
@@ -281,4 +281,59 @@ public class PuzzleManager : MonoBehaviour {
         lightRack.GetComponent<AllHexLightsController>().TurnOff(index);
     }
 
+    //Coroutine that Shrinks all the elements on the face of the cube till they disappear
+    public IEnumerator PushInAll()
+    {
+        //The play tiles.
+        Transform playTiles = transform.FindChild("PlayTiles");
+
+        //The edge connections.
+        Transform edgeConnections = transform.FindChild("EdgeConnections");
+
+        float timer = 0f;
+
+        while(timer < 5f)
+        {
+            //Push all the playTiles in.
+            playTiles.localScale = Vector3.Max(playTiles.localScale - new Vector3(0.01f, 0.01f, 0.01f), new Vector3(0.01f, 0.01f, 0.01f));
+            for(int i = 0; i < playTiles.childCount; i++)
+            {
+                Transform tile = playTiles.GetChild(i).transform;
+                tile.transform.position += -tile.transform.up * 0.015f * Time.deltaTime;
+                /*
+                tile.localPosition = new Vector3(
+                    Mathf.Lerp(originalPositions[i].x, originalPositions[i].x - 2f, timer / 10f),
+                    tile.localPosition.y,
+                    tile.localPosition.z);  */
+            }
+
+            //Push all the edgeConnections in.
+            for(int i = 0; i < edgeConnections.childCount; i++)
+            {
+                Transform edge = edgeConnections.GetChild(i).transform;
+                edge.transform.position += -edge.transform.up * 0.1f * Time.deltaTime;
+            }
+
+            timer += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+
+        //Destroy(edgeConnections.gameObject);
+        //Destroy(playTiles.gameObject);
+    }
+
+    //Coroutine that Replaces the transformed cube with a new KeyCube
+    public void ReplaceCube()
+    {
+        //Offset was -0.065 last check. Only the Y.
+        GameObject key = Instantiate(keyCube, transform.position, Quaternion.identity);
+
+    }
+
+    //Transform the cube.
+    public void TransformPuzzle()
+    {
+        play = false;
+        StartCoroutine(PushInAll());
+    }
 }
