@@ -24,9 +24,6 @@ public class AirlockAnimationController : MonoBehaviour {
 
     private bool eventIgnore = true;
     
-	//Currentbug:
-	//Seems to be firing on rotation over and over
-	//Could be related to start button or invokes here
 
     void Start()
     {

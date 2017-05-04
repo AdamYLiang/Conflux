@@ -84,6 +84,6 @@ public class EdgeNodeFeedback : MonoBehaviour {
     {
         react = false;
         
-        transform.GetChild(0).localScale = originalScale * 2.5f;
+        transform.localScale = originalScale * 2.5f;
     }
 }
