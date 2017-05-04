@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Valve.VR.InteractionSystem;
 
 public class GameManager : MonoBehaviour {
 
@@ -8,8 +9,10 @@ public class GameManager : MonoBehaviour {
     public GameObject controller1, controller2;
     public GameObject hmd;
 
-    public SteamVR_Controller.Device rightController, leftController;
-    public SteamVR_TrackedObject trackedObjRight = null, trackedObjLeft = null;
+    //public SteamVR_Controller.Device rightController, leftController;
+    //public SteamVR_TrackedObject trackedObjRight = null, trackedObjLeft = null;
+    public Hand hand1, hand2;
+
 
     // Use this for initialization
     void Start () {
@@ -24,33 +27,25 @@ public class GameManager : MonoBehaviour {
 	void Update () {
 		if(controller1 == null)
         {
-            controller1 = GameObject.Find("Controller (left)");
+            controller1 = GameObject.Find("Hand1");
         }
         else
         {
-            if(trackedObjLeft == null)
+            if(hand1 == null)
             {
-                trackedObjLeft = controller1.transform.GetComponent<SteamVR_TrackedObject>();
-            }
-            else
-            {
-                leftController = SteamVR_Controller.Input((int)trackedObjLeft.index);
+                hand1 = controller1.GetComponent<Hand>();
             }
         }
 
         if(controller2 == null)
         {
-            controller2 = GameObject.Find("Controller (right)");
+            controller2 = GameObject.Find("Hand2");
         }
         else
         {
-            if (trackedObjRight == null)
+            if(hand2 == null)
             {
-                trackedObjRight = controller2.transform.GetComponent<SteamVR_TrackedObject>();
-            }
-            else
-            {
-                rightController = SteamVR_Controller.Input((int)trackedObjRight.index);
+                hand2 = controller2.GetComponent<Hand>();
             }
         }
 

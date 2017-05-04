@@ -30,8 +30,16 @@ public class NodeFeedback : MonoBehaviour {
     {
         gameManager = GameObject.Find("GameManager");
 
-        controller1 = gameManager.GetComponent<GameManager>().controller1;
-        controller2 = gameManager.GetComponent<GameManager>().controller2;
+        if(gameManager.GetComponent<GameManager>().hand1 != null)
+        {
+            controller1 = gameManager.GetComponent<GameManager>().hand1.gameObject;
+        }
+        if (gameManager.GetComponent<GameManager>().hand2 != null)
+        {
+            controller2 = gameManager.GetComponent<GameManager>().hand2.gameObject;
+        }
+
+        detectRange = 0.2f;
 
         originalScale = transform.GetChild(0).localScale;
         ourMat = transform.GetChild(0).GetComponent<Renderer>().material;
@@ -40,23 +48,29 @@ public class NodeFeedback : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        //controller1 = gameManager.GetComponent<GameManager>().controller1;
-        //controller2 = gameManager.GetComponent<GameManager>().controller2;
+        if (gameManager.GetComponent<GameManager>().hand1 != null)
+        {
+            controller1 = gameManager.GetComponent<GameManager>().hand1.gameObject;
+        }
+        if (gameManager.GetComponent<GameManager>().hand2 != null)
+        {
+            controller2 = gameManager.GetComponent<GameManager>().hand2.gameObject;
+        }
         //Old if statement. Now used to get the sensorObject.
         if (controller1 != null && controller2 != null && react)
         {
             if(controller1 != null)
             {
-                if(controller1.transform.GetChild(1).GetComponent<DrawFromController>() != null)
+                if(controller1.transform.GetChild(3).GetComponent<DrawFromController>() != null)
                 {
-                    sensorObject = controller1.transform.GetChild(1).GetComponent<DrawFromController>().emitter;
+                    sensorObject = controller1;
                 }
             }
             if (controller2 != null)
             {
-                if (controller2.transform.GetChild(1).GetComponent<DrawFromController>() != null)
+                if (controller2.transform.GetChild(3).GetComponent<DrawFromController>() != null)
                 {
-                    sensorObject = controller2.transform.GetChild(1).GetComponent<DrawFromController>().emitter;
+                    sensorObject = controller2;
                 }
             }
         }
@@ -93,23 +107,22 @@ public class NodeFeedback : MonoBehaviour {
                 //Thus, with a detect range of 5, and a chosen distance of 3, our scale modifier will be 0.4f.
                 //At a range of 5 with chosen distance of 1, our scale modifeier will be 0.8f;
                 //Note: Issues because we are dividing decimals, which actually makes it bigger.
-                scaling = ((detectRange - chosen) / detectRange) * 3;
-                scaling = Mathf.Min(scaling, 2f);
-                if (scaling < 0f)
+                scaling = ((detectRange - chosen) / detectRange) * 6;
+                //Set a min and max.
+                if(scaling < 0.5f)
                 {
-                    scaling = 0;
+                    scaling = 0.5f;
                 }
-               
-                if(scaling < 0f)
+                else if(scaling > 2f)
                 {
-                    scaling = 0;  
+                    scaling = 2f;
                 }
                 onColor = true;
             }
             else
             {
                 //transform.GetChild(0).GetComponent<Renderer>().enabled = false;
-                scaling = 0.2f;
+                scaling = 0.5f;
                 onColor = false;
             }
 
