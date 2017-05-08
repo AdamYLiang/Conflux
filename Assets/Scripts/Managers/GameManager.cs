@@ -13,7 +13,6 @@ public class GameManager : MonoBehaviour {
     //public SteamVR_TrackedObject trackedObjRight = null, trackedObjLeft = null;
     public Hand hand1, hand2;
 
-
     // Use this for initialization
     void Start () {
 		

@@ -13,12 +13,13 @@ namespace Valve.VR.InteractionSystem
 	[RequireComponent( typeof( Interactable ) )]
 	public class LinearDrive : MonoBehaviour
 	{
-		public Transform startPosition;
-		public Transform endPosition;
+		public Vector3 startPosition;
+		public Vector3 endPosition;
 		public LinearMapping linearMapping;
 		public bool repositionGameObject = true;
 		public bool maintainMomemntum = true;
 		public float momemtumDampenRate = 5.0f;
+        public GameObject gameManager;
 
 		private float initialMappingOffset;
 		private int numMappingChangeSamples = 5;
@@ -38,6 +39,9 @@ namespace Valve.VR.InteractionSystem
 		//-------------------------------------------------
 		void Start()
 		{
+            startPosition += transform.localPosition;
+            endPosition += transform.localPosition;
+
 			if ( linearMapping == null )
 			{
 				linearMapping = GetComponent<LinearMapping>();
@@ -60,26 +64,29 @@ namespace Valve.VR.InteractionSystem
 		//-------------------------------------------------
 		private void HandHoverUpdate( Hand hand )
 		{
-			if ( hand.GetStandardInteractionButtonDown() )
-			{
-				hand.HoverLock( GetComponent<Interactable>() );
+            if (gameManager.GetComponent<GameManager>().hand2 == hand)
+            {
+                if (hand.GetStandardInteractionButtonDown())
+                {
+                    hand.HoverLock(GetComponent<Interactable>());
 
-				initialMappingOffset = linearMapping.value - CalculateLinearMapping( hand.transform );
-				sampleCount = 0;
-				mappingChangeRate = 0.0f;
-			}
+                    initialMappingOffset = linearMapping.value - CalculateLinearMapping(hand.transform);
+                    sampleCount = 0;
+                    mappingChangeRate = 0.0f;
+                }
 
-			if ( hand.GetStandardInteractionButtonUp() )
-			{
-				hand.HoverUnlock( GetComponent<Interactable>() );
+                if (hand.GetStandardInteractionButtonUp())
+                {
+                    hand.HoverUnlock(GetComponent<Interactable>());
 
-				CalculateMappingChangeRate();
-			}
+                    CalculateMappingChangeRate();
+                }
 
-			if ( hand.GetStandardInteractionButton() )
-			{
-				UpdateLinearMapping( hand.transform );
-			}
+                if (hand.GetStandardInteractionButton())
+                {
+                    UpdateLinearMapping(hand.transform);
+                }
+            }
 		}
 
 
@@ -111,7 +118,7 @@ namespace Valve.VR.InteractionSystem
 
 			if ( repositionGameObject )
 			{
-				transform.position = Vector3.Lerp( startPosition.position, endPosition.position, linearMapping.value );
+				transform.localPosition = Vector3.Lerp( startPosition, endPosition, linearMapping.value );
 			}
 		}
 
@@ -119,11 +126,11 @@ namespace Valve.VR.InteractionSystem
 		//-------------------------------------------------
 		private float CalculateLinearMapping( Transform tr )
 		{
-			Vector3 direction = endPosition.position - startPosition.position;
+			Vector3 direction = endPosition - startPosition;
 			float length = direction.magnitude;
 			direction.Normalize();
 
-			Vector3 displacement = tr.position - startPosition.position;
+			Vector3 displacement = tr.localPosition - startPosition;
 
 			return Vector3.Dot( displacement, direction ) / length;
 		}
@@ -140,7 +147,7 @@ namespace Valve.VR.InteractionSystem
 
 				if ( repositionGameObject )
 				{
-					transform.position = Vector3.Lerp( startPosition.position, endPosition.position, linearMapping.value );
+					transform.localPosition = Vector3.Lerp( startPosition, endPosition, linearMapping.value );
 				}
 			}
 		}
