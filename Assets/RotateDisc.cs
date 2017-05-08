@@ -25,6 +25,10 @@ public class RotateDisc : MonoBehaviour {
     //Smoothdamp velocity
     float velocity = 0.0f;
 
+    //Bool that controls whether we should be mapping.
+    public bool isMapping = false;
+    private float yVelocity;
+
 	// Use this for initialization
 	void Start () {
         rotationOffset = mappedObject.transform.eulerAngles;
@@ -42,31 +46,37 @@ public class RotateDisc : MonoBehaviour {
 
 
         //GetComponent<Rigidbody>().MoveRotation()
-
-        AutoCorrect();
-
-        //Calculate the smoothdamp y angle
-        float yAngle = Mathf.SmoothDampAngle(
-                transform.eulerAngles.y,
-                targetRotation.y,
-                ref velocity,
-                snap
-            );
-
-        //Debug.Log(yAngle);
-
-        //Snap the mapped object to the rotation.
-        transform.eulerAngles = new Vector3(
-            0,
-            yAngle,
-            0);
-
-        mappedObject.transform.eulerAngles = transform.eulerAngles + rotationOffset;
-
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (isMapping)
         {
             AutoCorrect();
+
+            //Calculate the smoothdamp y angle
+            float yAngle = Mathf.SmoothDampAngle(
+                    transform.eulerAngles.y,
+                    targetRotation.y,
+                    ref velocity,
+                    snap
+                );
+
+            //Debug.Log(yAngle);
+
+            //Snap the mapped object to the rotation.
+            transform.eulerAngles = new Vector3(
+                0,
+                yAngle,
+                0);
+
+            float mappedYAngle = yAngle + rotationOffset.y;
+
+            Vector3 newRotation = new Vector3(mappedObject.transform.eulerAngles.x,
+                Mathf.SmoothDampAngle(mappedObject.transform.eulerAngles.y, mappedYAngle, ref yVelocity, snap),
+                mappedObject.transform.eulerAngles.z);
+            
+
+            mappedObject.transform.rotation = Quaternion.Euler(newRotation);
+               
         }
+       
 
 	}
 

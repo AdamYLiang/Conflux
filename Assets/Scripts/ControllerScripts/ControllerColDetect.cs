@@ -1,32 +1,36 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Valve.VR.InteractionSystem;
 
 public class ControllerColDetect : MonoBehaviour
 {
     public GameObject selected = null;
     private GameObject highlighted = null;
 
-    public SteamVR_Controller.Device mainController;
-    public SteamVR_TrackedObject trackedObj;
+    //public SteamVR_Controller.Device mainController;
+    //public SteamVR_TrackedObject trackedObj;
+
+    public Hand altHand;
 
     public Material oldMat = null;
 
     void Start()
     {
-        trackedObj = transform.parent.GetComponent<SteamVR_TrackedObject>();
+        //trackedObj = transform.parent.GetComponent<SteamVR_TrackedObject>();
+        altHand = transform.parent.GetComponent<Hand>();
     }
 
     void Update()
     {
-        mainController = SteamVR_Controller.Input((int)trackedObj.index);
-        if (mainController.GetPressUp(SteamVR_Controller.ButtonMask.Trigger))
+        //mainController = SteamVR_Controller.Input((int)trackedObj.index);
+        if (altHand.GetStandardInteractionButtonUp())
         {
-            transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-            if(GetComponent<SpringJoint>() != null)
-            {
-                Destroy(GetComponent<SpringJoint>());
-            }
+            //transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+            //if(GetComponent<SpringJoint>() != null)
+           // {
+            //    Destroy(GetComponent<SpringJoint>());
+            //}
         }
 
 
@@ -96,7 +100,7 @@ public class ControllerColDetect : MonoBehaviour
         else if (col.name == "Interactable")
         {
             //If we press down pick up the interactable object.
-            if (mainController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) || Input.GetKeyDown(KeyCode.A))
+            if (altHand.GetStandardInteractionButtonDown() || Input.GetKeyDown(KeyCode.A))
             {
                 SpringJoint joint = gameObject.AddComponent<SpringJoint>();
                 col.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;

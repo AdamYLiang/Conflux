@@ -28,6 +28,10 @@ public class ConnectionNOde : MonoBehaviour {
 
         //It will always be the name of its parent.
         name = gameObject.name;
+        if (name.Contains("Connection"))
+        {
+            name = transform.parent.name;
+        }
 
         //Extract the coordinate from the name.
         //Skip 0 since it is '('
@@ -37,6 +41,7 @@ public class ConnectionNOde : MonoBehaviour {
         //While we don't reach ','
         while (name[counter] != ',')
         {
+            //Debug.Log(name[counter]);
             x += name[counter];
             //Exit if we reach the end.
             if (counter == name.Length)

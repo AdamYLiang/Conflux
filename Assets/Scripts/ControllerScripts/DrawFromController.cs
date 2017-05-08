@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Valve.VR.InteractionSystem;
 
 public class DrawFromController : MonoBehaviour {
 
@@ -14,22 +15,24 @@ public class DrawFromController : MonoBehaviour {
     public float durationOfFinishRumble = 1.5f; //Used when finished connection to receiver 
     public float powerOfFinishRumble = 0.9f; //Used when finished onnection to receiver 
 
+    Hand drawingHand;
     public GameObject gameManager;
 
     // Use this for initialization
     void Start () {
         trackedObj = transform.parent.GetComponent<SteamVR_TrackedObject>();
+        drawingHand = transform.parent.GetComponent<Hand>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        mainController = SteamVR_Controller.Input((int)trackedObj.index);
-        if (mainController.GetPressUp(SteamVR_Controller.ButtonMask.Trigger))
+        if (drawingHand.GetStandardInteractionButtonUp())
         {
             transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
             if (emitter != null)
             {
                 emitter.GetComponent<EmitterScript>().EndDraw();
+                //emitter.GetComponent<EmitterScript>().DisconnectEmitter();
                 emitter = null;
             }
         }
@@ -37,10 +40,10 @@ public class DrawFromController : MonoBehaviour {
 
     void OnTriggerStay(Collider col)
     {
-		Debug.Log(col.gameObject.name);
+		//Debug.Log(col.gameObject.name);
 		if(col.gameObject.name.Contains("CompleteButton")){
 			GameObject tempDoor = col.gameObject.transform.parent.gameObject;
-			if(mainController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) &&
+			if(drawingHand.GetStandardInteractionButtonDown() &&
 				tempDoor.GetComponent<DoorMaster>().isCompleted){
 				tempDoor.GetComponent<AirlockAnimationController>().CloseDoorIgnoreEvent();
 			}
@@ -53,15 +56,17 @@ public class DrawFromController : MonoBehaviour {
             if(col.gameObject.transform.parent.name.Contains("Emitter"))
             {
                 //Press a key and set our new draw origin to here.
-				if (mainController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) && 
+				if (drawingHand.GetStandardInteractionButtonDown() && 
 					col.gameObject.transform.parent.parent.parent.GetComponent<PuzzleManager>().play)
                 {
                     //Rumble
                     StartCoroutine(RumbleController(durationOfRumble, powerOfRumble));
-
+                   
                     transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
                     emitter = col.gameObject.transform.parent.gameObject;
+                    emitter.GetComponent<EmitterScript>().DisconnectEmitter();
                     emitter.GetComponent<EmitterScript>().StartDraw(gameObject);
+                    Debug.Log("Drawing node appears");
                 }
               
             }
@@ -71,12 +76,12 @@ public class DrawFromController : MonoBehaviour {
             //If we are not currently drawing
             if (emitter == null)
             {
-                if(mainController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) &&
+                if(drawingHand.GetStandardInteractionButtonDown() &&
                     col.gameObject.GetComponent<DrawNodeInfo>().pm.play)
                 {
                     //Rumble
                     StartCoroutine(RumbleController(durationOfRumble, powerOfRumble));
-
+                    
                     transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
                     emitter = col.gameObject.transform.parent.gameObject;
                     emitter.GetComponent<EmitterScript>().StartDraw(gameObject);
@@ -162,7 +167,7 @@ public class DrawFromController : MonoBehaviour {
                     {
                         Vector3 position = col.transform.parent.position;
                         bool valid = emitter.GetComponent<EmitterScript>().AddLineNode(col.gameObject);
-                        Debug.Log("Receiver isn't connected... Let's connect it to our emitter.");
+                        //Debug.Log("Receiver isn't connected... Let's connect it to our emitter.");
 
                         if (valid)
                         {
@@ -194,7 +199,7 @@ public class DrawFromController : MonoBehaviour {
         while (Time.realtimeSinceStartup - start <= duration)
         {
             int updatedPower = Mathf.RoundToInt(Mathf.Lerp(0, 3999, power));
-            mainController.TriggerHapticPulse((ushort)updatedPower);
+            drawingHand.controller.TriggerHapticPulse((ushort)updatedPower);
             yield return null;
         }
     }

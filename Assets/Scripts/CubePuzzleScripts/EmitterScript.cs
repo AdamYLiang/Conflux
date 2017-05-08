@@ -182,7 +182,7 @@ public class EmitterScript : MonoBehaviour {
             if(obj.transform.parent.name.Contains("Receiver") || obj.transform.parent.name.Contains("Point"))
             {
                 obj.transform.parent.GetComponent<ConnectedInfo>().received = false;
-                obj.transform.GetComponent<NodeFeedback>().react = true;
+                //obj.transform.GetComponent<NodeFeedback>().react = true;
             }
             setConnection(obj, false);
         }
@@ -230,7 +230,22 @@ public class EmitterScript : MonoBehaviour {
     //Set the connection node to bool
     public void setConnection(GameObject obj, bool connection)
     {
-         obj.transform.parent.GetComponent<ConnectionNOde>().connected = connection;
+        if(obj.transform.parent.name == "EdgeConnections")
+        {
+            obj.transform.GetComponent<ConnectionNOde>().connected = connection;
+            //obj.transform.GetComponent<EdgeNodeFeedback>().react = !connection;
+        }
+        else if (obj.transform.parent.name.Contains("Receiver") || obj.transform.parent.name.Contains("Emitter"))
+        {
+            obj.transform.parent.GetComponent<ConnectionNOde>().connected = connection;
+            //No feedback to modify on receiver or emitter.
+        }
+        else
+        { 
+            obj.transform.parent.GetComponent<ConnectionNOde>().connected = connection;
+            obj.transform.GetComponent<NodeFeedback>().react = !connection;
+        }
+         
     }
 
     //Check if connection node is connected
@@ -289,40 +304,51 @@ public class EmitterScript : MonoBehaviour {
         //Case 3: Node is not directly next to previous node.
         //The last position that we are comparing to.
         GameObject lastNode = linePositions[linePositions.Count - 2];
-
-        //If we aren't compraing to an edgeconnection
-        if(node.transform.parent.name != "EdgeConnections")
+        if(lastNode != null)
         {
-            //Compare as coordinates on a grid.
-            //Check if it hsa retrieved its coordinate. If not, get it not.
-            if(lastNode.GetComponent<ConnectionNOde>().coordinate == -Vector3.one)
+            //If we aren't compraing to an edgeconnection
+            if (node.transform.parent.name != "EdgeConnections" && lastNode.transform.parent.name != "EdgeConnections")
             {
-                lastNode.GetComponent<ConnectionNOde>().RetrieveCoordinate();
-            }
-            Vector3 lastCoordinate = lastNode.GetComponent<ConnectionNOde>().coordinate;
-            //Same for the other node.
-            if (node.GetComponent<ConnectionNOde>().coordinate == -Vector3.one)
-            {
-                node.GetComponent<ConnectionNOde>().RetrieveCoordinate();
-            }
-            Vector3 newCoordinate = node.GetComponent<ConnectionNOde>().coordinate;
+                //Compare as coordinates on a grid.
+                //Check if it hsa retrieved its coordinate. If not, get it not.
+                //Hack fix. If this node's parent is the emitter or receiver, we need to go to the parent.
+                if (lastNode.transform.parent.name.Contains("Emitter") || lastNode.transform.parent.name.Contains("Receiver"))
+                {
+                    lastNode = lastNode.transform.parent.gameObject;
+                }
+                if (lastNode.GetComponent<ConnectionNOde>().coordinate == -Vector3.one)
+                {
+                    lastNode.GetComponent<ConnectionNOde>().RetrieveCoordinate();
+                }
+                Vector3 lastCoordinate = lastNode.GetComponent<ConnectionNOde>().coordinate;
+                //Same for the other node.
+                if (node.transform.parent.name.Contains("Emitter") || node.transform.parent.name.Contains("Receiver"))
+                {
+                    node = node.transform.parent.gameObject;
+                }
+                if (node.GetComponent<ConnectionNOde>().coordinate == -Vector3.one)
+                {
+                    node.GetComponent<ConnectionNOde>().RetrieveCoordinate();
+                }
+                Vector3 newCoordinate = node.GetComponent<ConnectionNOde>().coordinate;
 
-            if (ViableConnection(lastCoordinate, newCoordinate))
+                if (ViableConnection(lastCoordinate, newCoordinate))
+                {
+                    return true;
+                }
+               
+            }//If one of them is an edge connection, check for a distance.
+            else
             {
-                return true;
-            }
-        }//If it is an edge connection, check for a distance.
-        else
-        {
-            Vector3 lastPosition = lastNode.transform.position;
-            Vector3 newPosition = node.transform.position;
+                Vector3 lastPosition = lastNode.transform.position;
+                Vector3 newPosition = node.transform.position;
 
-            if(Vector3.Distance(lastPosition, newPosition) < puzzleScale)
-            {
-                return true;
+                if (Vector3.Distance(lastPosition, newPosition) < puzzleScale)
+                {
+                    return true;
+                }
             }
         }
-
         return false;
 
         //Old case 2:
@@ -353,27 +379,33 @@ public class EmitterScript : MonoBehaviour {
     {
         //Only return true if only one of the coordinates changes AND it only changes by one.
         Vector3 difference = coord1 - coord2;
+        bool xOne = false, yOne = false, zOne = false;
 
         if(difference.x == 0 && difference.y == 0)
         {
             if(Mathf.Abs(difference.z) == 1)
             {
-                return true;
+                xOne = true;
             }
         }
         else if(difference.x == 0 && difference.z == 0)
         {
             if(Mathf.Abs(difference.y) == 1)
             {
-                return true;
+                yOne = true;
             }
         }
         else if(difference.y == 0 && difference.z == 0)
         {
             if(Mathf.Abs(difference.x) == 1)
             {
-                return true;
+                zOne = true;
             }
+        }
+        
+        if(xOne ^ yOne ^ zOne)
+        {
+            return true;
         }
         return false;
     }

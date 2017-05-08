@@ -103,14 +103,14 @@ public class PuzzleObject : MonoBehaviour {
     {
         //Debug.Log(col.name);
 
-        if(gm.leftController != null)
+        if(gm.hand2 != null)
         {
-            if (gm.leftController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
+            if (gm.hand2.GetStandardInteractionButtonDown())
             {
                 Debug.Log("Pressing");
             }
 
-            if (gm.leftController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) &&
+            if (gm.hand2.GetStandardInteractionButtonDown() &&
             col.transform.parent == gm.controller1)
             {
                 if (!lerping)
@@ -130,9 +130,9 @@ public class PuzzleObject : MonoBehaviour {
             }
         }
        
-        if(gm.rightController != null)
+        if(gm.hand1 != null)
         {
-            if (gm.rightController.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) &&
+            if (gm.hand1.GetStandardInteractionButtonDown() &&
                 col.transform.parent.gameObject == gm.controller2)
             {
                 Debug.Log("Right");
