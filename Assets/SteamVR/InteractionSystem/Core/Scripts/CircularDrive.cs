@@ -212,22 +212,29 @@ namespace Valve.VR.InteractionSystem
 		//-------------------------------------------------
 		private void OnHandHoverBegin( Hand hand )
 		{
-			ControllerButtonHints.ShowButtonHint( hand, Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger );
+            if(hand == gameManager.GetComponent<GameManager>().hand2)
+            {
+                ControllerButtonHints.ShowButtonHint(hand, Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger);
+            }
+			
 		}
 
 
 		//-------------------------------------------------
 		private void OnHandHoverEnd( Hand hand )
 		{
-			ControllerButtonHints.HideButtonHint( hand, Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger );
+            if (hand == gameManager.GetComponent<GameManager>().hand2)
+            {
+                ControllerButtonHints.HideButtonHint(hand, Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger);
 
-			if ( driving && hand.GetStandardInteractionButton() )
-			{
-				StartCoroutine( HapticPulses( hand.controller, 1.0f, 10 ) );
-			}
+                if (driving && hand.GetStandardInteractionButton())
+                {
+                    StartCoroutine(HapticPulses(hand.controller, 1.0f, 10));
+                }
 
-			driving = false;
-			handHoverLocked = null;
+                driving = false;
+                handHoverLocked = null;
+            }
 		}
 
 
