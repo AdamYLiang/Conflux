@@ -40,12 +40,19 @@ public class DrawFromController : MonoBehaviour {
 
     void OnTriggerStay(Collider col)
     {
+//		if(col.gameObject.tag == "CubePuzzle"){
+//			if(drawingHand.GetStandardInteractionButtonDown()){
+//				transform.parent.gameObject.GetComponent<Hand>().AttachObject(col.gameObject);
+//			}
+//		}
+
 		//Debug.Log(col.gameObject.name);
 		if(col.gameObject.name.Contains("CompleteButton")){
 			GameObject tempDoor = col.gameObject.transform.parent.gameObject;
 			if(drawingHand.GetStandardInteractionButtonDown() &&
 				tempDoor.GetComponent<DoorMaster>().isCompleted){
-				tempDoor.GetComponent<AirlockAnimationController>().CloseDoorIgnoreEvent();
+				tempDoor.GetComponent<AirlockAnimationController>().CloseDoor();
+				//tempDoor.GetComponent<DoorMaster>().Invoke("ToggleDoor2", 1f);	
 			}
 		}
 
@@ -93,7 +100,6 @@ public class DrawFromController : MonoBehaviour {
 
     void OnTriggerEnter(Collider col)
     {
-
         //Found a connection node.
         if (col.gameObject.name.Contains("ConnectionNode"))
         {

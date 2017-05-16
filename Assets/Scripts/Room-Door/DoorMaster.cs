@@ -76,6 +76,7 @@ public class DoorMaster : MonoBehaviour {
 			isCompleted = true;
 			//GetComponent<AirlockAnimationController>().CloseDoorIgnoreEvent();
 		}
+			
     }
 
 	void RoomTurnOff(){
@@ -139,4 +140,15 @@ public class DoorMaster : MonoBehaviour {
         }
         allClosed = false;
     }
+
+	public void ToggleRoom2(){
+		if(isCompleted){
+			TotalLocks = 4;
+			currentLocks = 0;
+			isCompleted = false;
+			Room1.SetActive(false);
+			Room2.SetActive(true);
+
+		}
+	}
 }
