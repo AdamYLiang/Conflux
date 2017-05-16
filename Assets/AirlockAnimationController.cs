@@ -115,6 +115,7 @@ public class AirlockAnimationController : MonoBehaviour {
                 yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length + 2f);
                 if (!eventIgnore) {
                     animationFinished.Invoke();
+					Debug.Log("Invoked");
                 }
                 eventIgnore = false;
                 closeDoor = false;
