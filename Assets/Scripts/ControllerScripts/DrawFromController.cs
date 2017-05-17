@@ -51,6 +51,8 @@ public class DrawFromController : MonoBehaviour {
 			GameObject tempDoor = col.gameObject.transform.parent.gameObject;
 			if(drawingHand.GetStandardInteractionButtonDown() &&
 				tempDoor.GetComponent<DoorMaster>().isCompleted){
+
+				tempDoor.transform.GetChild(0).GetComponent<ElevatorLight>().ToggleEleLight();
 				tempDoor.GetComponent<AirlockAnimationController>().CloseDoor();
 				//tempDoor.GetComponent<DoorMaster>().Invoke("ToggleDoor2", 1f);	
 			}

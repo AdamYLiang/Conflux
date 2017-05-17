@@ -39,6 +39,12 @@ public class DoorMaster : MonoBehaviour {
 
     void Update()
     {
+		//Debug cheat to get through 1st room
+		if(Input.GetKeyDown(KeyCode.U)){
+			isCompleted = true;
+			gameObject.transform.GetChild(0).GetComponent<ElevatorLight>().ToggleEleLightOn();
+			gameObject.GetComponent<AirlockAnimationController>().CloseDoor();
+		}
 
         if (locked && lockedChanged)
         {
