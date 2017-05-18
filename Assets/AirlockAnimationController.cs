@@ -21,6 +21,7 @@ public class AirlockAnimationController : MonoBehaviour {
     private bool openDoor = false, closeDoor = false;
 
     public UnityEvent animationFinished = new UnityEvent();
+	public UnityEvent openDoorDone = new UnityEvent(); //used to toggle light off, other one is in hand when button pressed
 
     private bool eventIgnore = true;
     
@@ -103,6 +104,7 @@ public class AirlockAnimationController : MonoBehaviour {
         while (true) {
             if (openDoor) {
                 animator.Play("OpenDoor");
+				openDoorDone.Invoke();
                 yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length + 2f);
                 if (!eventIgnore) {
                     animationFinished.Invoke();
@@ -115,6 +117,7 @@ public class AirlockAnimationController : MonoBehaviour {
                 yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length + 2f);
                 if (!eventIgnore) {
                     animationFinished.Invoke();
+					Debug.Log("Invoked");
                 }
                 eventIgnore = false;
                 closeDoor = false;

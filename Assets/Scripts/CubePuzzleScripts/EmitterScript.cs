@@ -58,7 +58,7 @@ public class EmitterScript : MonoBehaviour {
         //Initialize the emitter.
       
         //puzzleScale = transform.root.lossyScale.x;
-        SetLaserPigment(manager.GetLaserPigment(laserColor)/3);
+        SetLaserPigment(manager.GetLaserPigment(laserColor)/2);
     
 	}
 	
@@ -95,7 +95,7 @@ public class EmitterScript : MonoBehaviour {
         }
         else
         {
-            laserPigment = color / 3f;
+            laserPigment = color / 2f;
             lr.material.color = laserPigment;
         }
         transform.FindChild("Emitter").GetChild(0).GetComponent<Renderer>().material.color = laserPigment;
