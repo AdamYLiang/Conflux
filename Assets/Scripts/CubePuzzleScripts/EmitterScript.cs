@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class EmitterScript : MonoBehaviour {
 
@@ -34,8 +35,14 @@ public class EmitterScript : MonoBehaviour {
 
     Vector3 scale = new Vector3(1f, .25f, 1f);
 
-    //The particle system
-    public GameObject pSystem;
+    //The indicator prefab
+    public GameObject indicator;
+
+    //The corresponding receiver it should be going to.
+    public GameObject endReceiver;
+
+    //Event that is calle when we begin drawing.
+    //public UnityEvent OnStartDraw;
 
     // Use this for initialization
     void Start () {
@@ -106,6 +113,7 @@ public class EmitterScript : MonoBehaviour {
         linePositions.Add((transform.FindChild("ConnectionNode").gameObject));
         linePositions.Add(new GameObject());
         SetLaserPigment(manager.GetLaserPigment(laserColor));
+        Instantiate(indicator, endReceiver.transform.position, endReceiver.transform.rotation);
 
     }
 
