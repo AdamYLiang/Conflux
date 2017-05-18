@@ -20,11 +20,14 @@ public class DoorMaster : MonoBehaviour {
     //Assign each manually in inspector 
     public GameObject Room1; //starting room
     public GameObject Room2; //ending room
+    public GameObject Room3; //Finale room
     protected bool usedRoom = false; //When set to true, will flip which rooms to set active and inactive
 
 	public int TotalLocks;
 	public int currentLocks = 0;
 	public bool isCompleted = false;
+
+    int toggleTimes = 0;
 
     public bool[] lights;
 
@@ -46,6 +49,8 @@ public class DoorMaster : MonoBehaviour {
 			gameObject.GetComponent<AirlockAnimationController>().CloseDoor();
 		}
 
+      
+
         if (locked && lockedChanged)
         {
             GetComponent<AirlockAnimationController>().CloseDoorIgnoreEvent();
@@ -59,7 +64,7 @@ public class DoorMaster : MonoBehaviour {
 
 		//If both adjacent rooms are inactive, then set this door inactive, also resets the forloop so that it can turn on doors
 		//Only activates if the player is not inside
-		if(!Room1.activeSelf && !Room2.activeSelf && !isPlayerIn){
+		if(!Room1.activeSelf && !Room2.activeSelf && !Room3.activeSelf && !isPlayerIn){
 			Room1.GetComponent<RoomInfo>().doorsOpen = false;
 			Room2.GetComponent<RoomInfo>().doorsOpen = false;
 			RoomTurnOff();
@@ -147,6 +152,22 @@ public class DoorMaster : MonoBehaviour {
         allClosed = false;
     }
 
+    public void ToggleNextRoom()
+    {
+        if (isCompleted)
+        {
+            if(toggleTimes == 0)
+            {
+                ToggleRoom2();
+            }
+            else if(toggleTimes == 1)
+            {
+                ToggleRoom3();
+            }
+            toggleTimes++;
+        }
+    }
+
 	public void ToggleRoom2(){
 		if(isCompleted){
 			TotalLocks = 4;
@@ -154,7 +175,21 @@ public class DoorMaster : MonoBehaviour {
 			isCompleted = false;
 			Room1.SetActive(false);
 			Room2.SetActive(true);
+            Room3.SetActive(false);
 
 		}
 	}
+
+    public void ToggleRoom3()
+    {
+        if (isCompleted)
+        {
+            TotalLocks = 1;
+            currentLocks = 0;
+            isCompleted = false;
+            Room1.SetActive(false);
+            Room2.SetActive(false);
+            Room3.SetActive(true);
+        }
+    }
 }
